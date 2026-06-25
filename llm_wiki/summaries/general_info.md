@@ -23,11 +23,14 @@ Adding a new tool is essentially a one-line change in the `TOOLS` list of `src/j
 ## Repository Structure
 
 ```
-    instructions/             ---> Folder with all the instructions
-        original_IT_files/    ---> Original version of the instructions file (in italian). Can be ignored.
-    scripts_sh/               ---> Folder for any shell scripts to be used in the future
-    src/                      ---> Folder for all the JLT source code
-    tutorial/                 ---> Old folder. Can be ignored
+    llm_wiki/                   ---> "wiki" of the project
+        detailed_descriptions/  ---> Contains detailed description for the all project
+        instructions/           ---> Folder with instructions file
+            original_IT_files/  ---> Original version of the instructions file (in italian). Can be ignored.
+        summaries/              ---> Contains various summery for the whole project
+    scripts_sh/                 ---> Folder for any shell scripts to be used in the future
+    src/                        ---> Folder for all the JLT source code
+    tutorial/                   ---> Old folder. Can be ignored
     LICENSE
     README.md
     pyproject.toml
@@ -48,5 +51,5 @@ src/
 
 ## Coding Style
 
-When writing or modifying code in this repository, follow the conventions described in [`0_codying_and_style_instructions_ENG.md`](./0_codying_and_style_instructions_ENG.md).
+When writing or modifying code in this repository, follow the conventions described in [`codying_and_style_instructions_ENG.md`](../instructions/generic_instruction/codying_and_style_instructions_ENG.md).
 That file is the single source of truth for the coding style and is kept separate from this summary so it can be updated independently.
