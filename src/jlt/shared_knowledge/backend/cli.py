@@ -5,8 +5,7 @@ Invoked as::
 
     jlt backend <subcommand, variable, flags>
 
-The ``backend`` tool manages the LLM backends shared across every JLT tool. It
-exposes the following subcommands :
+The ``backend`` tool manages the LLM backends shared across every JLT tool. It exposes the following subcommands :
 
 - ``config`` : configure (create or update) a backend from a config file.
 - ``list`` (alias ``ls``) : list the configured backends.
@@ -133,8 +132,7 @@ def _register_activate(subparsers : argparse._SubParsersAction) -> None :
         "--backend_name",
         type     = str,
         required = True,
-        help     = "Name of the backend to activate (mandatory). It must "
-                   "already be configured.",
+        help     = "Name of the backend to activate (mandatory). It must already be configured.",
     )
 
     parser.set_defaults(func = run_activate)
@@ -155,8 +153,7 @@ def _register_remove(subparsers : argparse._SubParsersAction) -> None :
         "--backend_name",
         type     = str,
         required = True,
-        help     = "Name of the backend to remove (mandatory). It must "
-                   "already be configured.",
+        help     = "Name of the backend to remove (mandatory). It must already be configured.",
     )
 
     parser.set_defaults(func = run_remove)
