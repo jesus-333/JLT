@@ -3,12 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-include = ["/src"]
+packages = ["src/jlt"]
 
-[tool.hatch.build.targets.wheel.sources]
-"src" = "jlt"
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 [project]
 name = "jlt"
@@ -17,9 +14,12 @@ license = "Apache-2.0"
 authors = [
   { name = "Alberto (Jesus) Zancanaro", email = "alberto.zancanaro.1@gmail.com" },
 ]
-description = ""
+description = "Jesus's LLM Tools (JLT): a collection of LLM-powered tools."
 dependencies = [
 ]
 [project.optional-dependencies]
 extra = [
 ]
+
+[project.scripts]
+jlt = "jlt.cli:main"
