@@ -36,6 +36,8 @@ Very long functions are better split into specific sub-functions.
     - E.g. when declaring a dictionary with many entries, align the equals signs for each key.
     - E.g. when calling a function split across multiple lines with one argument per line, align the equals signs.
 - When using `argparse`, provide an exhaustive description for each argument, the input type, and a default value if the argument is optional.
+- When you add new `cli`, if they are made up of multiple word, use hyphen to separate them.
+    - E.g. `my-multi-word-cli-command`
 
 ## Docstrings
 
