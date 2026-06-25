@@ -26,14 +26,18 @@ src/
             cli.py              ---> CLI entry point for autoresearch
             config_experiment/  ---> Code related to experiment configuraion. To be implemented in future.
             run_experiment/     ---> Code related to running experiment. To be implemented in future.
+            other..             ---> Any other files/folders you think might be useful 
         shared_knowledge/       ---> Source code shared by all tools
             ...
 ```
 
-Il comando da `cli` deve essere chiamato tramite `jlt backend`. Da qui ci devono essere ulteriori sottocomandi. Per oguno di essi ho specificato anche le flag.
+Il comando da `cli` deve essere chiamato tramite `jlt autoresearch` (con possibilità di abbreviarlo con `jlt ar`). 
+Da qui ci devono essere ulteriori sottocomandi. Per oguno di essi ho specificato anche le flag.
 - `add` : usato per configurare la l'esperimento. Da notare che questo comando non crea una copia dei file dell'esperimento ma semplicemente ne salva il path internamente al tool.
     - `--path_folder` : path ad un file config valido. Questa flag deve essere usata obbligatoriamente. 
     - `--experiment_name`: nome con cui salvare l'esperimento. Se non specificato viene usato quella della cartella dove sono salvati i file.
 - `list` : per mostrare tutti gli esperimenti nel registro (può essere abbreviato con `ls`)
 - `remove` : rimuove dal registro l'esperimento specificaot (può essere abbreviato con `rm`)
     - `--experiment_name` : flag obbligatoria. Specifica il nome dell'esperimento da rimuovere
+- `run` : esegue l'esperimento specificato
+    - `--experiment_name` : flag obbligatoria. Specifica il nome dell'esperimento da eseguire
