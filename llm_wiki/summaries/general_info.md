@@ -23,14 +23,19 @@ Adding a new tool is essentially a one-line change in the `TOOLS` list of `src/j
 ## Repository Structure
 
 ```
-    llm_wiki/                   ---> "wiki" of the project
-        detailed_descriptions/  ---> Contains detailed description for the all project
-        instructions/           ---> Folder with instructions file
-            original_IT_files/  ---> Original version of the instructions file (in italian). Can be ignored.
-        summaries/              ---> Contains various summery for the whole project
-    scripts_sh/                 ---> Folder for any shell scripts to be used in the future
-    src/                        ---> Folder for all the JLT source code
-    tutorial/                   ---> Old folder. Can be ignored
+    llm_wiki/                       ---> "wiki" of the project
+        README.md                   ---> Short description of the wiki itself
+        index.md                    ---> Entry point / map of the wiki
+        instructions/               ---> Files written by the maintainer describing new tasks / stuff to implement
+            0_original_IT_files/    ---> Original version of the instructions files (in italian). Can be ignored.
+            backend/                ---> Backend-related instructions (English)
+            generic_instruction/    ---> Generic coding/style/repo-setup instructions (English)
+        detailed_descriptions/      ---> Detailed descriptions of how the code and repository work (to be populated)
+        dump/                       ---> Scratch folder for WIP files (temporary descriptions, TODO lists, notes, ...)
+        summaries/                  ---> Contains various summaries for the whole project
+    scripts_sh/                     ---> Folder for any shell scripts to be used in the future
+    src/                            ---> Folder for all the JLT source code
+    tutorial/                       ---> Old folder. Can be ignored
     LICENSE
     README.md
     pyproject.toml
