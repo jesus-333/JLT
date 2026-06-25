@@ -6,7 +6,6 @@ Per ora il tool autoresearch deve avere 2 sottocomandi :
 - `config_experiment`
 - `run_experiment`
 
-
 Il tool deve funzionare a grandi linee in questo modo 
 0) L'utente configura la backend che vuole usare per LLM (ollama, claude, chatGPT etc)
 1) L'utente crea i file per far runnare l'esperimento e li salva in una cartella.
@@ -34,3 +33,11 @@ src/
         shared_knowledge/       ---> Source code shared by all tools
             ...
 ```
+
+Il comando da `cli` deve essere chiamato tramite `jlt backend`. Da qui ci devono essere ulteriori sottocomandi. Per oguno di essi ho specificato anche le flag.
+- `add` : usato per configurare la l'esperimento. Da notare che questo comando non crea una copia dei file dell'esperimento ma semplicemente ne salva il path internamente al tool.
+    - `--path_folder` : path ad un file config valido. Questa flag deve essere usata obbligatoriamente. 
+    - `--experiment_name`: nome con cui salvare l'esperimento. Se non specificato viene usato quella della cartella dove sono salvati i file.
+- `list` : per mostrare tutti gli esperimenti nel registro (può essere abbreviato con `ls`)
+- `remove` : rimuove dal registro l'esperimento specificaot (può essere abbreviato con `rm`)
+    - `--experiment_name` : flag obbligatoria. Specifica il nome dell'esperimento da rimuovere
