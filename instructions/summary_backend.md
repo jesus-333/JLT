@@ -1,22 +1,38 @@
 # Backend Subsystem Summary
 
+The **backend** subsystem gives every JLT tool a single, unified way to talk to
+a Large Language Model, regardless of which provider actually answers. It is
+primarily meant to be used from the command line (`jlt backend ...`), so the
+CLI is documented first. The Python implementation is described at the end for
+the curious reader.
+
+## Index
+
+- [Purpose](#purpose)
+- [Key ideas](#key-ideas)
+- [Installation](#installation)
+- [Configuration files](#configuration-files)
+  - [Per-backend keys](#per-backend-keys)
+  - [Where configs are stored](#where-configs-are-stored)
+- [CLI reference](#cli-reference)
+- [CLI examples](#cli-examples)
+- [Python implementation](#python-implementation)
+  - [Repository layout](#repository-layout)
+  - [The `generic_backend` class](#the-generic_backend-class)
+  - [Using the backend from Python](#using-the-backend-from-python)
+  - [Adding a new backend](#adding-a-new-backend)
+
 ## Purpose
 
-The **backend** subsystem gives every JLT tool a single, unified way to talk to
-a Large Language Model, regardless of which provider actually answers. A tool
-never needs to know whether the request is served by Claude, ChatGPT, Ollama or
-GitHub Copilot — it just asks "the backend".
-
-It is exposed on the command line as a subcommand of `jlt`:
+A tool never needs to know whether a request is served by Claude, ChatGPT,
+Ollama or GitHub Copilot — it just asks "the backend". The backend is exposed on
+the command line as a subcommand of `jlt`:
 
 ```
 jlt backend <subcommand> <flags>
 ```
 
-The code lives under `src/jlt/shared_knowledge/backend/` because it is meant to
-be reused by all tools.
-
-## Key Ideas
+## Key ideas
 
 - A **backend** is one configured connection to a provider (model + credentials
   + options).
@@ -26,53 +42,24 @@ be reused by all tools.
 - One backend at a time can be **active**. Tools use the active backend unless
   told otherwise.
 
-## Repository Layout
+## Installation
 
-```
-src/jlt/shared_knowledge/backend/
-    __init__.py          ---> re-exports the most useful entry points
-    generic.py           ---> abstract template (generic_backend)
-    claude.py            ---> Anthropic (Claude) backend
-    chat_gpt.py          ---> OpenAI (ChatGPT) backend
-    ollama.py            ---> Ollama backend (local and cloud)
-    github_copilot.py    ---> GitHub Copilot backend
-    config_io.py         ---> read toml/json, write json
-    registry.py          ---> stores/lists/activates/removes named backends
-    cli.py               ---> the `jlt backend` command
+The core package has no dependency. Each backend pulls its own provider SDK
+through an optional extra, so you install only what you need:
+
+```bash
+pip install jlt[claude]          # Anthropic SDK only
+pip install jlt[chat_gpt]        # OpenAI SDK only
+pip install jlt[github_copilot]  # OpenAI SDK (Copilot uses it)
+pip install jlt[ollama]          # Ollama SDK only
+pip install jlt[all-backends]    # every provider SDK at once
 ```
 
-## The `generic_backend` Class
+## Configuration files
 
-`generic.py` defines the abstract template every backend inherits from. It
-already implements all the high-level behaviour on top of two small,
-provider-specific primitives that each concrete backend must provide.
+A configuration is a plain dictionary, stored on disk as `toml` or `json`. You
+pass one to `jlt backend config` to create or update a backend.
 
-### Methods exposed to the tools
-
-| Method | What it does |
-| --- | --- |
-| `__init__(config_path)` | Receives the path to the config file. If the file exists it is read and validated immediately. |
-| `update_config(config)` | Validates a config dictionary (via `check_config`) and saves it. Also called from `__init__`. |
-| `update_config_from_file(file_path)` | Reads a dictionary from a `toml`/`json` file, then calls `update_config`. |
-| `check_config(config)` | **Abstract.** Backend-specific validity check. Called by `update_config` before saving. |
-| `modify_file(prompt, file_to_edit, other_files=None)` | Rewrites `file_to_edit` following `prompt`. `prompt` can be the instructions themselves *or* a path to a text file containing them. `other_files` is reserved for future use. |
-| `read_file(file_to_read, summarize=False)` | Reads a text file. If `summarize=True`, returns an LLM-generated summary instead. |
-| `read_files(list_of_files, summarize=False)` | Same as `read_file` but for a list; results are concatenated into one string, each block prefixed with its file path. |
-
-### Provider-specific primitives
-
-Each concrete backend implements just two methods:
-
-- `check_config(config)` — raise an error if the config is invalid.
-- `_chat(prompt, system=None)` — send one prompt to the model and return the
-  text answer. All the file logic above is built on this single call.
-
-This is what keeps adding a new provider simple: subclass `generic_backend`,
-implement those two methods, and register it (see below).
-
-## Configuration Files
-
-A configuration is a plain dictionary, stored on disk as `toml` or `json`.
 **Every config must contain a `backend_type` key** — this is how the tool knows
 which provider to use. Supported values:
 
@@ -140,20 +127,7 @@ as `json`) under the JLT config directory:
 2. `$XDG_CONFIG_HOME/jlt` if set,
 3. `~/.config/jlt` otherwise.
 
-## Installation
-
-The core package has no dependency. Each backend pulls its own provider SDK
-through an optional extra, so you install only what you need:
-
-```bash
-pip install jlt[claude]          # Anthropic SDK only
-pip install jlt[chat_gpt]        # OpenAI SDK only
-pip install jlt[github_copilot]  # OpenAI SDK (Copilot uses it)
-pip install jlt[ollama]          # Ollama SDK only
-pip install jlt[all-backends]    # every provider SDK at once
-```
-
-## CLI Reference
+## CLI reference
 
 ```
 jlt backend config   --backend_name <name> --path_file <path>   # create / update
@@ -166,7 +140,7 @@ jlt backend remove   --backend_name <name>                      # delete (alias:
 - `activate` and `remove` error out if the backend is not already configured.
 - Removing the active backend also clears the active pointer.
 
-## Examples
+## CLI examples
 
 ### 1. Configure a Claude backend (toml)
 
@@ -233,7 +207,60 @@ $ jlt backend rm --backend_name personal_claude
 Backend 'personal_claude' removed successfully.
 ```
 
-### 5. Use the active backend from Python (inside a tool)
+---
+
+## Python implementation
+
+This section is for anyone interested in how the backend works under the hood,
+or who wants to call it directly from Python (e.g. when building a new tool).
+
+### Repository layout
+
+The backend code lives under `src/jlt/shared_knowledge/backend/` because it is
+meant to be reused by all tools.
+
+```
+src/jlt/shared_knowledge/backend/
+    __init__.py          ---> re-exports the most useful entry points
+    generic.py           ---> abstract template (generic_backend)
+    claude.py            ---> Anthropic (Claude) backend
+    chat_gpt.py          ---> OpenAI (ChatGPT) backend
+    ollama.py            ---> Ollama backend (local and cloud)
+    github_copilot.py    ---> GitHub Copilot backend
+    config_io.py         ---> read toml/json, write json
+    registry.py          ---> stores/lists/activates/removes named backends
+    cli.py               ---> the `jlt backend` command
+```
+
+### The `generic_backend` class
+
+`generic.py` defines the abstract template every backend inherits from. It
+already implements all the high-level behaviour on top of two small,
+provider-specific primitives that each concrete backend must provide.
+
+#### Methods exposed to the tools
+
+| Method | What it does |
+| --- | --- |
+| `__init__(config_path)` | Receives the path to the config file. If the file exists it is read and validated immediately. |
+| `update_config(config)` | Validates a config dictionary (via `check_config`) and saves it. Also called from `__init__`. |
+| `update_config_from_file(file_path)` | Reads a dictionary from a `toml`/`json` file, then calls `update_config`. |
+| `check_config(config)` | **Abstract.** Backend-specific validity check. Called by `update_config` before saving. |
+| `modify_file(prompt, file_to_edit, other_files=None)` | Rewrites `file_to_edit` following `prompt`. `prompt` can be the instructions themselves *or* a path to a text file containing them. `other_files` is reserved for future use. |
+| `read_file(file_to_read, summarize=False)` | Reads a text file. If `summarize=True`, returns an LLM-generated summary instead. |
+| `read_files(list_of_files, summarize=False)` | Same as `read_file` but for a list; results are concatenated into one string, each block prefixed with its file path. |
+
+#### Provider-specific primitives
+
+Each concrete backend implements just two methods:
+
+- `check_config(config)` — raise an error if the config is invalid.
+- `_chat(prompt, system=None)` — send one prompt to the model and return the
+  text answer. All the file logic above is built on this single call.
+
+This is what keeps adding a new provider simple.
+
+### Using the backend from Python
 
 ```python
 from jlt.shared_knowledge.backend import load_backend
@@ -259,7 +286,7 @@ backend.modify_file("Add type hints to every function", "module.py")
 backend.modify_file("instructions.txt", "module.py")
 ```
 
-## Adding a New Backend
+### Adding a new backend
 
 1. Create a new module under `backend/` (e.g. `gemini.py`).
 2. Subclass `generic_backend` and implement `check_config` and `_chat`.
