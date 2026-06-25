@@ -12,6 +12,8 @@ documentation.
 
 ## Instructions
 
+Files written by the maintainer describing new tasks and stuff to implement.
+
 - [`instructions/generic_instruction/codying_and_style_instructions_ENG.md`](instructions/generic_instruction/codying_and_style_instructions_ENG.md)
   — Single source of truth for coding style.
 - [`instructions/generic_instruction/repo_setup_ENG.md`](instructions/generic_instruction/repo_setup_ENG.md)
@@ -20,6 +22,18 @@ documentation.
   — Backend setup instructions.
 - `instructions/0_original_IT_files/` — Original Italian versions of the
   instruction files. Can be ignored.
+
+## Detailed descriptions
+
+- [`detailed_descriptions/`](detailed_descriptions/) — In-depth explanations of
+  how the code and the repository work. To be populated over time. Separate from
+  `instructions/`.
+
+## Dump
+
+- [`dump/`](dump/) — Scratch folder for work-in-progress files. When implementing
+  new features/code, put any temporary description files, TODO lists, notes, etc.
+  here.
 
 ## Quick map of the repository
 
