@@ -36,8 +36,9 @@ Adding a new tool is essentially a one-line change in the `TOOLS` list of `src/j
     pyproject.toml
 ```
 
-Inside `src` there is a `jlt` package. Each tool has its own subfolder, plus a shared subpackage for code reused across tools:
+Inside `src` there is a `jlt` package. Each tool has its own subfolder, plus a shared subpackage for code reused across tools.
 
+<!-- Note that this should be a general reference structure... there is no need to have all the specific tools listed here -->
 ```
 src/
     jlt/
