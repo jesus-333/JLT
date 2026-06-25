@@ -29,6 +29,7 @@ from . import __version__
 # Each entry maps a tool name to the module that exposes ``register(subparsers)``.
 # Adding a new tool is a one-line change here.
 TOOLS = (
+    "jlt.shared_knowledge.backend.cli",
     "jlt.autoresearch.cli",
     "jlt.club.cli",
 )
