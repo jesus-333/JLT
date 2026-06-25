@@ -6,12 +6,12 @@ build-backend = "hatchling.build"
 include = ["/src"]
 
 [tool.hatch.build.targets.wheel.sources]
-"src" = "addl"
+"src" = "jlt"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 [project]
-name = "my_rag"
+name = "jlt"
 version = "0.0.1"
 license = "Apache-2.0"
 authors = [
@@ -19,7 +19,6 @@ authors = [
 ]
 description = ""
 dependencies = [
-	"pymilvus",
 ]
 [project.optional-dependencies]
 extra = [

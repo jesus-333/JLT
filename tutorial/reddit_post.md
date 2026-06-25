@@ -1,4 +1,4 @@
-Copy of a reddit post called "Building RAG systems at enterprise scale (20K+ docs): lessons from 10+ enterprise implementations"
+Copy of a reddit posts called "Building RAG systems at enterprise scale (20K+ docs): lessons from 10+ enterprise implementations"
 
 # General discussion post
 

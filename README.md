@@ -1,2 +1,3 @@
-# My Rag Repo
-As the name suggests this repository contains code with rag implementations
+# Jesus's LLM Tools
+
+Personal experiments for LLMs development.
