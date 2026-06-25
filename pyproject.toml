@@ -15,11 +15,23 @@ authors = [
   { name = "Alberto (Jesus) Zancanaro", email = "alberto.zancanaro.1@gmail.com" },
 ]
 description = "Jesus's LLM Tools (JLT): a collection of LLM-powered tools."
+requires-python = ">=3.11"
+# The core package has no hard dependency: each backend pulls its own provider
+# SDK through the optional-dependencies below (e.g. `pip install jlt[claude]`).
 dependencies = [
 ]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 [project.optional-dependencies]
-extra = [
-]
+# One extra per backend, so the user can install only what is needed.
+# E.g. `pip install jlt[claude]` to use JLT with Claude only.
+claude         = ["anthropic"]
+chat_gpt       = ["openai"]
+github_copilot = ["openai"]
+ollama         = ["ollama"]
+# Convenience extra installing the SDKs of every backend at once.
+all-backends   = ["anthropic", "openai", "ollama"]
 
 [project.scripts]
 jlt = "jlt.cli:main"
