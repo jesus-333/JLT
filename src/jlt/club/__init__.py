@@ -1,1 +1,3 @@
-"""club: an LLM-powered tool (work in progress)."""
+"""
+club: an LLM-powered tool (work in progress).
+"""

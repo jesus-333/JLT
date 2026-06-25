@@ -1,1 +1,3 @@
-"""autoresearch: an LLM-powered tool (work in progress)."""
+"""
+autoresearch: an LLM-powered tool (work in progress).
+"""
