@@ -20,9 +20,10 @@ More information about the registry at the end of this file.
 An experiment corresponds to a folder containing scripts.
 These scripts can do anything (e.g. numerical simulations, neural network training, etc.).
 
-This folder must mandatorily contain two things:
+This folder must mandatorily contain three things:
 
 - A subfolder called `config`. All configuration files required by the experiments will be saved here. For now, only `toml` and `json` formats are accepted.
+- An `experiment_description` file (either `.txt` or `.md`) holding a complete description of the experiment, its purpose, and what it wants to achieve.
 - A script called `run.py` that starts the experiment. For now it can only be a Python file.
   - This Python file must have a `run` function that returns a numeric value (the metric that `autoresearch` must optimize).
   - When the `run` command is implemented, `autoresearch` will execute precisely this `run` file.
@@ -46,6 +47,7 @@ Once the path to the experiment files has been received, the following checks mu
 
 - That the path is valid and the folder exists.
 - That the `config` subfolder is present.
+- That an `experiment_description` file (`.txt` or `.md`) is present. If no such file is found, raise an error.
 - That the `run.py` script is present:
   - That it contains a `run` function.
   - That the `run` function returns a value:
