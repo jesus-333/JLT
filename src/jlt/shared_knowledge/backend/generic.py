@@ -67,14 +67,13 @@ class generic_backend(abc.ABC) :
         self.config_path    = Path(config_path)
         self.config         = None
 
-        # If a configuration already exists at ``config_path`` load it now so the backend is immediately usable. 
+        # If a configuration already exists at ``config_path`` load it now so the backend is immediately usable.
         # ``update_config`` takes care of validating it before storing it.
+        # If the file does not exist yet, ``config`` is left as ``None`` : the backend is meant to be configured right after construction through :meth:`update_config` / :meth:`update_config_from_file` (this is exactly what :func:`~jlt.shared_knowledge.backend.registry.configure_backend` does when creating a brand new backend).
+        # When a tool needs a ready to use backend it goes through :func:`~jlt.shared_knowledge.backend.registry.load_backend`, which guarantees the configuration file exists before constructing the backend.
         if self.config_path.is_file() :
             existing_config = read_config_file(self.config_path)
             self.update_config(existing_config)
-        else :
-            # Raise an error if the configuration file does not exist. This forces the user to provide a valid configuration before using the backend.
-            raise ValueError(f"No configuration file found at '{self.config_path}'. Please provide a valid configuration.")
 
     def update_config(self, config : dict) -> None :
         """

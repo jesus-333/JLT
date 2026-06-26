@@ -80,8 +80,7 @@ guess differently each time.
   import them. When you write a new genuinely-shared helper, put it here (a new
   module if it doesn't fit an existing one) rather than nesting it under a tool.
 - The JLT config directory is shared by all tools and resolved via
-  `JLT_CONFIG_DIR` → `XDG_CONFIG_HOME/jlt` → `~/.config/jlt`. **Each tool
-  namespaces its own data under `<config_dir>/<tool_name>/`** (e.g.
-  `autoresearch/`). The `backend` tool is the historical exception: it writes
-  `active.json` and `backends/` directly at the config-dir root. Keep new tools
-  namespaced to avoid filename collisions.
+  `JLT_CONFIG_DIR` → `XDG_CONFIG_HOME/jlt` → `~/.config/jlt`. **Every tool
+  namespaces its own data under `<config_dir>/<tool_name>/`, no exceptions**
+  (e.g. `autoresearch/`, `backend/`). Keep new tools namespaced to avoid
+  filename collisions.

@@ -3,7 +3,7 @@ Filesystem paths shared across all JLT tools.
 
 Several tools need to know where JLT stores its data on disk (the *configuration directory*). This module centralises that resolution so every tool agrees on a single location, instead of each one re-deriving it.
 
-The configuration directory is **not** tool specific : each tool is expected to namespace its own data under ``<config_dir>/<tool_name>/`` (the ``backend`` tool is a historical exception that writes directly at the root).
+The configuration directory is **not** tool specific : each tool namespaces its own data under ``<config_dir>/<tool_name>/`` (e.g. ``<config_dir>/backend/``, ``<config_dir>/autoresearch/``), with no exceptions.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
