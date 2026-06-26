@@ -13,10 +13,16 @@ The public functions are re-exported here so the rest of the package can simply 
 from __future__ import annotations
 
 # Internal imports
-from .experiments import add_experiment, list_experiments, remove_experiment
+from .experiments import (
+    add_experiment,
+    add_experiment_from_info_file,
+    list_experiments,
+    remove_experiment,
+)
 
 __all__ = [
     "add_experiment",
+    "add_experiment_from_info_file",
     "list_experiments",
     "remove_experiment",
 ]
