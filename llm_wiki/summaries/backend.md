@@ -22,9 +22,7 @@ primarily meant to be used from the command line (`jlt backend ...`),
 
 ## Purpose
 
-A tool never needs to know whether a request is served by Claude, ChatGPT,
-Ollama or GitHub Copilot — it just asks "the backend". The backend is exposed on
-the command line as a subcommand of `jlt`:
+A tool never needs to know whether a request is served by Claude, ChatGPT, Ollama or GitHub Copilot — it just asks "the backend". The backend is exposed on the command line as a subcommand of `jlt`:
 
 ```
 jlt backend <subcommand> <flags>
@@ -32,13 +30,9 @@ jlt backend <subcommand> <flags>
 
 ## Key ideas
 
-- A **backend** is one configured connection to a provider (model + credentials
-  + options).
-- Each backend is saved under a **name** you choose. You can have **several
-  backends for the same provider** — e.g. two Claude accounts saved as
-  `work_claude` and `personal_claude`.
-- One backend at a time can be **active**. Tools use the active backend unless
-  told otherwise.
+- A **backend** is one configured connection to a provider (model + credentials + options).
+- Each backend is saved under a **name** you choose. You can have **several backends for the same provider** — e.g. two Claude accounts save as `work_claude` and `personal_claude`.
+- One backend at a time can be **active**. Tools use the active backend unless told otherwise.
 
 ## Installation
 
@@ -55,11 +49,9 @@ pip install jlt[all-backends]    # every provider SDK at once
 
 ## Configuration files
 
-A configuration is a plain dictionary, stored on disk as `toml` or `json`. You
-pass one to `jlt backend config` to create or update a backend.
+A configuration is a plain dictionary, stored on disk as `toml` or `json`. You pass one to `jlt backend config` to create or update a backend.
 
-**Every config must contain a `backend_type` key** — this is how the tool knows
-which provider to use. Supported values:
+**Every config must contain a `backend_type` key** — this is how the tool knows which provider to use. Supported values:
 
 | `backend_type` | Provider |
 | --- | --- |
