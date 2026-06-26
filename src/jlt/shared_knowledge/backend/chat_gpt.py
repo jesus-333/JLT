@@ -34,12 +34,9 @@ class chat_gpt_backend(generic_backend) :
     The configuration dictionary accepts the following keys :
 
     - ``backend_type`` : must be ``"chat_gpt"`` (mandatory).
-    - ``api_key`` : the OpenAI API key. Optional: if missing, the SDK falls
-      back to the ``OPENAI_API_KEY`` environment variable.
-    - ``model`` : the model id to use. Optional, defaults to
-      :data:`DEFAULT_MODEL`.
-    - ``base_url`` : a custom API base URL. Optional, useful for OpenAI
-      compatible endpoints.
+    - ``api_key`` : the OpenAI API key. Optional: if missing, the SDK falls back to the ``OPENAI_API_KEY`` environment variable.
+    - ``model`` : the model id to use. Optional, defaults to :data:`DEFAULT_MODEL`.
+    - ``base_url`` : a custom API base URL. Optional, useful for OpenAI compatible endpoints.
     """
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,8 +54,7 @@ class chat_gpt_backend(generic_backend) :
         Raises
         ------
         ValueError
-            If ``config`` is not a dictionary or its ``backend_type`` does not
-            match :data:`BACKEND_TYPE`.
+            If ``config`` is not a dictionary or its ``backend_type`` does not match :data:`BACKEND_TYPE`.
         """
 
         if not isinstance(config, dict) :

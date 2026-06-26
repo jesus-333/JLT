@@ -1,5 +1,3 @@
-Okay, inizialmente volevo
-
 Come suggerisce il nome questo deve una version cli dell'idea che karpathy ha avuto con l'[autoresearch](https://github.com/karpathy/autoresearch/tree/master).
 
 Il tool deve funzionare a grandi linee in questo modo 
@@ -21,13 +19,13 @@ A livello di codice python ci deve essere la seguente struttura
 ```
 src/
     jlt/
-        cli.py                  ---> Top-level CLI entry point (the jlt command)
-        autoresearch/           ---> Source code for tool 1
-            cli.py              ---> CLI entry point for autoresearch
-            config_experiment/  ---> Code related to experiment configuraion. To be implemented in future.
-            run_experiment/     ---> Code related to running experiment. To be implemented in future.
-            other..             ---> Any other files/folders you think might be useful 
-        shared_knowledge/       ---> Source code shared by all tools
+        cli.py              ---> Top-level CLI entry point (the jlt command)
+        autoresearch/       ---> Source code for tool 1
+            cli.py          ---> CLI entry point for autoresearch
+            manage/         ---> Code related to experiments managament (add, remove, configuration, list etc)
+            run/            ---> Code related to running experiment. To be implemented in future.
+            other..         ---> Any other files/folders you think might be useful 
+        shared_knowledge/   ---> Source code shared by all tools
             ...
 ```
 
@@ -41,3 +39,10 @@ Da qui ci devono essere ulteriori sottocomandi. Per oguno di essi ho specificato
     - `--experiment_name` : flag obbligatoria. Specifica il nome dell'esperimento da rimuovere
 - `run` : esegue l'esperimento specificato
     - `--experiment_name` : flag obbligatoria. Specifica il nome dell'esperimento da eseguire
+
+I comandi `add`, `list` and `remove` devono chiamare analoghe funzioni python (e.g. `add` punterà ad `add_experiment`) all'interno della cartella `manage`.
+Il comando `run` deve puntare ad una funzione python chiamata `run_experiment` all'interno della cartella `run`
+
+Per ora implementa solo la struttura dei comandi cli. Per il funzionamento specifico dell'autoresearch ci penseremo più avanti.
+
+P.s. in futuro potrei voler implementare nuovi comandi oltre a quelli qui presenti.
