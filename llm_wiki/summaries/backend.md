@@ -227,9 +227,18 @@ src/jlt/shared_knowledge/backend/
     chat_gpt.py          ---> OpenAI (ChatGPT) backend
     ollama.py            ---> Ollama backend (local and cloud)
     github_copilot.py    ---> GitHub Copilot backend
-    config_io.py         ---> read toml/json, write json
     registry.py          ---> stores/lists/activates/removes named backends
     cli.py               ---> the `jlt backend` command
+```
+
+Two generic helpers used by the backend are **not** backend-specific and live
+one level up, directly under `src/jlt/shared_knowledge/` (so other tools can
+reuse them without importing the backend package):
+
+```
+src/jlt/shared_knowledge/
+    config_io.py         ---> read toml/json, write json
+    paths.py             ---> get_config_dir (the JLT config root)
 ```
 
 ### The `generic_backend` class

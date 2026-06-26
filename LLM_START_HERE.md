@@ -72,15 +72,13 @@ guess differently each time.
 
 ## Shared code & per-tool data layout
 
-- Code reused across tools lives under `src/jlt/shared_knowledge/`. Today the
-  generic helpers `get_config_dir` (the JLT config root) and `config_io`
-  (toml/json read, json write) physically sit under
-  `shared_knowledge/backend/`, even though they are not backend-specific —
-  `autoresearch` imports them from there. Importing them pulls no provider SDK
-  (those are lazy). If you add a **third** consumer, consider promoting these
-  helpers to a neutral location (e.g. `shared_knowledge/config_io.py`,
-  `shared_knowledge/paths.py`) so a tool never has to import another tool's
-  package.
+- Code reused across tools lives **directly** under `src/jlt/shared_knowledge/`,
+  not inside any specific tool, so a tool never has to import another tool's
+  package. The generic helpers there are `shared_knowledge/paths.py`
+  (`get_config_dir`, the JLT config root) and `shared_knowledge/config_io.py`
+  (toml/json read, json write); both the `backend` and `autoresearch` tools
+  import them. When you write a new genuinely-shared helper, put it here (a new
+  module if it doesn't fit an existing one) rather than nesting it under a tool.
 - The JLT config directory is shared by all tools and resolved via
   `JLT_CONFIG_DIR` → `XDG_CONFIG_HOME/jlt` → `~/.config/jlt`. **Each tool
   namespaces its own data under `<config_dir>/<tool_name>/`** (e.g.

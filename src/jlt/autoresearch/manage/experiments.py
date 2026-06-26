@@ -29,7 +29,7 @@ from .validation import validate_experiment_folder
 
 # Reuse the shared toml/json reader for the optional ``--experiment_info_path``
 # file (it accepts both formats, exactly what we need here).
-from jlt.shared_knowledge.backend.config_io import read_config_file
+from jlt.shared_knowledge.config_io import read_config_file
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Module constants

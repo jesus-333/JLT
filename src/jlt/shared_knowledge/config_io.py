@@ -1,14 +1,11 @@
 """
-Reading and writing helpers for backend configuration files.
+Reading and writing helpers for JLT configuration files.
 
-The backends accept configuration as a plain Python dictionary. On disk that
-dictionary can live in different formats: at the moment ``toml`` and ``json``
-are supported. This module isolates the format specific logic so the rest of
-the backend code (see :mod:`~jlt.shared_knowledge.backend.generic`) only ever
-deals with dictionaries.
+Several JLT tools accept configuration as a plain Python dictionary. On disk that dictionary can live in different formats : at the moment ``toml`` and ``json`` are supported. This module isolates the format specific logic so the rest of the code only ever deals with dictionaries.
 
-New formats can be added by extending :data:`READERS` (for parsing) and, if the
-format should also be writable, :data:`WRITERS`.
+It lives directly under :mod:`jlt.shared_knowledge` (rather than inside a specific tool) because it is generic and reused across tools, e.g. by the backend subsystem and by :mod:`~jlt.autoresearch`.
+
+New formats can be added by extending :data:`READERS` (for parsing) and, if the format should also be writable, :data:`WRITERS`.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

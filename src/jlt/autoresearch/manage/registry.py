@@ -18,7 +18,7 @@ Layout of the configuration directory ::
                     readme.md       ---> short description of the folder
                 ...
 
-The configuration directory (``<config_dir>``) is the very same one used by the backend subsystem, so :func:`~jlt.shared_knowledge.backend.registry.get_config_dir` is reused here to keep a single source of truth for the JLT configuration root.
+The configuration directory (``<config_dir>``) is the very same one used by every other JLT tool, so :func:`~jlt.shared_knowledge.paths.get_config_dir` is reused here to keep a single source of truth for the JLT configuration root.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,12 +33,11 @@ import shutil
 from pathlib import Path
 
 # Internal imports
-# The JLT configuration root and the toml/json IO helpers are shared with the
-# backend subsystem. Importing them here keeps a single source of truth and
-# avoids duplicating logic. Note that importing the backend registry does not
-# pull any provider SDK : those are imported lazily inside each backend.
-from jlt.shared_knowledge.backend.config_io import read_config_file, write_config_file
-from jlt.shared_knowledge.backend.registry import get_config_dir
+# The JLT configuration root and the toml/json IO helpers are generic and live
+# directly under ``shared_knowledge`` (not inside any specific tool). Reusing
+# them here keeps a single source of truth and avoids duplicating logic.
+from jlt.shared_knowledge.config_io import read_config_file, write_config_file
+from jlt.shared_knowledge.paths import get_config_dir
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Module constants

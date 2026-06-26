@@ -31,7 +31,7 @@ import abc
 from pathlib import Path
 
 # Internal imports
-from .config_io import read_config_file, write_config_file
+from ..config_io import read_config_file, write_config_file
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Abstract base class

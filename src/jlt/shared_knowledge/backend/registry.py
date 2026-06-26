@@ -24,14 +24,12 @@ with the ``JLT_CONFIG_DIR`` environment variable (or ``XDG_CONFIG_HOME``).
 
 from __future__ import annotations
 
-# Full module imports
-import os
-
 # Specific imports
 from pathlib import Path
 
 # Internal imports
-from .config_io import read_config_file, write_config_file
+from ..config_io import read_config_file, write_config_file
+from ..paths import get_config_dir
 from .generic import generic_backend
 from .ollama import ollama_backend
 from .claude import claude_backend
@@ -58,30 +56,6 @@ BACKENDS_DIR_NAME = "backends"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Path helpers
-
-def get_config_dir() -> Path :
-    """
-    Return the directory where JLT stores its configuration.
-
-    The directory is resolved in the following order :
-
-    1. The ``JLT_CONFIG_DIR`` environment variable, if set.
-    2. ``$XDG_CONFIG_HOME/jlt``, if ``XDG_CONFIG_HOME`` is set.
-    3. ``~/.config/jlt`` otherwise.
-
-    Returns
-    -------
-    config_dir : pathlib.Path
-        The (not necessarily existing) configuration directory.
-    """
-
-    if os.environ.get("JLT_CONFIG_DIR") :
-        return Path(os.environ["JLT_CONFIG_DIR"])
-
-    if os.environ.get("XDG_CONFIG_HOME") :
-        return Path(os.environ["XDG_CONFIG_HOME"]) / "jlt"
-
-    return Path.home() / ".config" / "jlt"
 
 def get_backends_dir() -> Path :
     """
