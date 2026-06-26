@@ -7,13 +7,16 @@ It manages where their configurations live on disk, which provider each one uses
 Several backends can be configured for the same provider. For example two Claude accounts can be saved under two different names.
 Each configured backend is stored as a ``json`` file named after the chosen backend name.
 
+Like every other JLT tool, the backend keeps all of its data under its own namespace (``backend``) inside the configuration directory.
+
 Layout of the configuration directory ::
 
     <config_dir>/
-        active.json             ---> stores the name of the active backend
-        backends/
-            <backend_name>.json ---> one file per configured backend
-            ...
+        backend/
+            active.json             ---> stores the name of the active backend
+            backends/
+                <backend_name>.json ---> one file per configured backend
+                ...
 
 The configuration directory defaults to ``~/.config/jlt`` and can be overridden
 with the ``JLT_CONFIG_DIR`` environment variable (or ``XDG_CONFIG_HOME``).
@@ -24,14 +27,12 @@ with the ``JLT_CONFIG_DIR`` environment variable (or ``XDG_CONFIG_HOME``).
 
 from __future__ import annotations
 
-# Full module imports
-import os
-
 # Specific imports
 from pathlib import Path
 
 # Internal imports
-from .config_io import read_config_file, write_config_file
+from ..config_io import read_config_file, write_config_file
+from ..paths import get_config_dir
 from .generic import generic_backend
 from .ollama import ollama_backend
 from .claude import claude_backend
@@ -50,6 +51,10 @@ BACKEND_CLASSES = {
     "github_copilot" : github_copilot_backend,
 }
 
+# Name of the backend's own namespace inside the JLT configuration directory.
+# Like every other tool, the backend keeps all of its data under this folder.
+BACKEND_DIR_NAME = "backend"
+
 # Name of the file storing the active backend pointer.
 ACTIVE_FILE_NAME = "active.json"
 
@@ -59,36 +64,21 @@ BACKENDS_DIR_NAME = "backends"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Path helpers
 
-def get_config_dir() -> Path :
+def get_backend_dir() -> Path :
     """
-    Return the directory where JLT stores its configuration.
+    Return the backend's namespace inside the JLT configuration directory.
 
-    The directory is resolved in the following order :
-
-    1. The ``JLT_CONFIG_DIR`` environment variable, if set.
-    2. ``$XDG_CONFIG_HOME/jlt``, if ``XDG_CONFIG_HOME`` is set.
-    3. ``~/.config/jlt`` otherwise.
-
-    Returns
-    -------
-    config_dir : pathlib.Path
-        The (not necessarily existing) configuration directory.
+    This is the ``backend`` sub-folder of the shared configuration directory, under which every backend related file is stored.
     """
 
-    if os.environ.get("JLT_CONFIG_DIR") :
-        return Path(os.environ["JLT_CONFIG_DIR"])
-
-    if os.environ.get("XDG_CONFIG_HOME") :
-        return Path(os.environ["XDG_CONFIG_HOME"]) / "jlt"
-
-    return Path.home() / ".config" / "jlt"
+    return get_config_dir() / BACKEND_DIR_NAME
 
 def get_backends_dir() -> Path :
     """
     Return the directory holding one config file per configured backend.
     """
 
-    return get_config_dir() / BACKENDS_DIR_NAME
+    return get_backend_dir() / BACKENDS_DIR_NAME
 
 def get_backend_config_path(backend_name : str) -> Path :
     """
@@ -112,7 +102,7 @@ def get_active_file_path() -> Path :
     Return the path of the file storing the active backend pointer.
     """
 
-    return get_config_dir() / ACTIVE_FILE_NAME
+    return get_backend_dir() / ACTIVE_FILE_NAME
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Backend class resolution

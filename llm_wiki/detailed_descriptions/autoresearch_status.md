@@ -84,7 +84,8 @@ executed** :
 ```
 
 `<config_dir>` is the shared JLT config dir (`JLT_CONFIG_DIR` /
-`XDG_CONFIG_HOME` / `~/.config/jlt`), reused from the backend subsystem.
+`XDG_CONFIG_HOME` / `~/.config/jlt`), resolved by
+`get_config_dir` in `shared_knowledge/paths.py`.
 
 ## Source file map
 

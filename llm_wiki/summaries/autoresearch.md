@@ -109,9 +109,9 @@ Both folders start with :
 The internal folder additionally stores `info.json`, the registry entry holding
 the experiment path, metric name and optimisation direction.
 
-The configuration directory is the same one used by the
-[backend subsystem](backend.md#where-configs-are-stored) and is resolved through
-`JLT_CONFIG_DIR` / `XDG_CONFIG_HOME` / `~/.config/jlt` :
+The configuration directory is the same one used by every other JLT tool (e.g.
+the [backend subsystem](backend.md#where-configs-are-stored)) and is resolved
+through `JLT_CONFIG_DIR` / `XDG_CONFIG_HOME` / `~/.config/jlt` :
 
 ```
 <config_dir>/
@@ -138,7 +138,7 @@ src/jlt/autoresearch/
         runner.py           ---> experiment execution (still a stub)
 ```
 
-The registry reuses two helpers from the backend subsystem to avoid duplicating
-logic : `get_config_dir` (the JLT configuration root) and the `toml`/`json` IO
-helpers from `config_io`. Importing them does not pull any provider SDK, since
-those are imported lazily inside each backend.
+The registry reuses two generic helpers that live directly under
+`src/jlt/shared_knowledge/` (not inside any specific tool) to avoid duplicating
+logic : `get_config_dir` from `shared_knowledge/paths.py` (the JLT configuration
+root) and the `toml`/`json` IO helpers from `shared_knowledge/config_io.py`.
