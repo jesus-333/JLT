@@ -2,9 +2,7 @@
 
 The **backend** subsystem gives every JLT tool a single, unified way to talk to
 a Large Language Model, regardless of which provider actually answers. It is
-primarily meant to be used from the command line (`jlt backend ...`), so the
-CLI is documented first. The Python implementation is described at the end for
-the curious reader.
+primarily meant to be used from the command line (`jlt backend ...`), 
 
 ## Index
 
