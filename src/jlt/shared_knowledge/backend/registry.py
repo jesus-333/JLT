@@ -1,14 +1,11 @@
 """
 Registry of configured backends.
 
-While :mod:`~jlt.shared_knowledge.backend.generic` (and its subclasses) describe
-*how* a single backend behaves, this module manages the *set* of backends the
-user has configured: where their configurations live on disk, which provider
-each one uses, and which one is currently active.
+While :mod:`~jlt.shared_knowledge.backend.generic` (and its subclasses) describe *how* a single backend behaves, this module manages the *set* of backends the user has configured.
+It manages where their configurations live on disk, which provider each one uses, and which one is currently active.
 
-Several backends can be configured for the same provider. For example two
-Claude accounts can be saved under two different names. Each configured backend
-is stored as a ``json`` file named after the chosen backend name.
+Several backends can be configured for the same provider. For example two Claude accounts can be saved under two different names.
+Each configured backend is stored as a ``json`` file named after the chosen backend name.
 
 Layout of the configuration directory ::
 
@@ -288,8 +285,7 @@ def load_backend(backend_name : str | None = None) -> generic_backend :
     Parameters
     ----------
     backend_name : str, optional
-        The name of the backend to load. If ``None`` the active backend is
-        loaded instead.
+        The name of the backend to load. If ``None`` the active backend is loaded instead.
 
     Returns
     -------
@@ -299,8 +295,7 @@ def load_backend(backend_name : str | None = None) -> generic_backend :
     Raises
     ------
     ValueError
-        If no backend name is given and none is active, or if the requested
-        backend is not configured.
+        If no backend name is given and none is active, or if the requested backend is not configured.
     """
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -310,8 +305,7 @@ def load_backend(backend_name : str | None = None) -> generic_backend :
         backend_name = get_active_backend_name()
         if backend_name is None :
             raise ValueError(
-                "No active backend set. Activate one with "
-                "'jlt backend activate --backend_name <name>'."
+                "No active backend set. Activate one with'jlt backend activate --backend_name <name>'."
             )
 
     if backend_name not in list_backends() :

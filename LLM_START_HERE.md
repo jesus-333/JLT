@@ -7,6 +7,11 @@ understand the project structure and conventions:
 - [`llm_wiki/summaries/general_info.md`](llm_wiki/summaries/general_info.md) —
   project purpose, CLI usage and repository structure.
 
+## Coding Style
+
+When writing or modifying code in this repository, follow the conventions described in [`codying_and_style_instructions_ENG.md`](./llm_wiki/instructions/generic_instruction/codying_and_style_instructions_ENG.md).
+That file is the single source of truth for the coding style and is kept separate from this summary so it can be updated independently.
+
 ## Conventions for the wiki folders
 
 - `llm_wiki/instructions/` — files written by the maintainer describing new tasks
@@ -17,7 +22,3 @@ understand the project structure and conventions:
   need to create temporary description files, TODO lists, notes, etc., put them
   here.
 
-## Coding Style
-
-When writing or modifying code in this repository, follow the conventions described in [`codying_and_style_instructions_ENG.md`](./llm_wiki/instructions/generic_instruction/codying_and_style_instructions_ENG.md).
-That file is the single source of truth for the coding style and is kept separate from this summary so it can be updated independently.

@@ -109,8 +109,7 @@ E.g. con il file `txt`
 Per ogni round inoltre sarà prodotto un file di `log` con considerazioni riguardo all'esperimento e al processo di ottimizzazione.
 I file avranno nome `round_i.md` dove `i` sarà sostituito dal numero del round. 
 Ovviamente adesso non devi implementare la creazione di questi file (sarà fatto più avanti quando lavoreremo sull'implementazione di `run`) ma volevo che tu sapessi che esistevano.
-Oltre ai file di `log` per ogni giorno ci sarà anche un file di log riassuntivo che sarà aggiornato alla fine di ogni esperimento.
-
+Oltre ai file di `log` per ogni giorno ci sarà anche un file di log riassuntivo (`summary_log.md`) che sarà aggiornato alla fine di ogni esperimento.
 
 Tutte queste informazioni dovranno essere salvata nella cartella `jlt_log_<experiment_name>` e in una cartella interna al tool con nome `<experiment_name>`.
 
