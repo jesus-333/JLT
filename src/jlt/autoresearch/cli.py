@@ -92,8 +92,9 @@ def _register_add(subparsers : argparse._SubParsersAction) -> None :
     parser.add_argument(
         "--path_folder",
         type     = str,
-        required = True,
-        help     = "Path to a valid experiment config folder (mandatory).",
+        required = False,
+        default  = None,
+        help     = "Path to a valid experiment folder. Mandatory, unless --experiment_info_path is used.",
     )
 
     parser.add_argument(
@@ -102,6 +103,42 @@ def _register_add(subparsers : argparse._SubParsersAction) -> None :
         required = False,
         default  = None,
         help     = "Name under which to register the experiment (optional). Defaults to the name of the folder.",
+    )
+
+    parser.add_argument(
+        "--metric_name",
+        type     = str,
+        required = False,
+        default  = None,
+        help     = "Name of the metric to optimise. Mandatory, unless --experiment_info_path is used.",
+    )
+
+    # The optimisation direction : exactly one of the two flags is expected (the
+    # mutually exclusive group forbids passing both at the same time).
+    direction_group = parser.add_mutually_exclusive_group()
+
+    direction_group.add_argument(
+        "--ascending",
+        action = "store_true",
+        help   = "Maximise the metric. Cannot be combined with --descending.",
+    )
+
+    direction_group.add_argument(
+        "--descending",
+        action = "store_true",
+        help   = "Minimise the metric. Cannot be combined with --ascending.",
+    )
+
+    parser.add_argument(
+        "--experiment_info_path",
+        type     = str,
+        required = False,
+        default  = None,
+        help     = (
+            "Path to a json/toml file holding every field above "
+            "(path_folder, experiment_name, metric_name, ascending/descending). "
+            "When used, no other flag can be passed."
+        ),
     )
 
     parser.set_defaults(func = run_add)
@@ -168,10 +205,12 @@ def run_add(args : argparse.Namespace) -> int :
     """
     Entry point for ``jlt autoresearch add``.
 
+    The experiment can be described either directly through the individual flags (``--path_folder``, ``--metric_name``, ``--ascending``/``--descending``, ``--experiment_name``) or through a single ``--experiment_info_path`` file. The two ways are mutually exclusive.
+
     Parameters
     ----------
     args : argparse.Namespace
-        Parsed arguments (uses ``path_folder`` and ``experiment_name``).
+        Parsed arguments (uses ``path_folder``, ``experiment_name``, ``metric_name``, ``ascending``, ``descending`` and ``experiment_info_path``).
 
     Returns
     -------
@@ -180,12 +219,79 @@ def run_add(args : argparse.Namespace) -> int :
     """
 
     try :
-        manage.add_experiment(args.path_folder, args.experiment_name)
+        if args.experiment_info_path is not None :
+            # Every field comes from the file : no other flag is allowed.
+            _ensure_no_conflicting_flags(args)
+            experiment_name = manage.add_experiment_from_info_file(args.experiment_info_path)
+        else :
+            # Fields come from the individual flags : check the mandatory ones.
+            _ensure_required_add_flags(args)
+            experiment_name = manage.add_experiment(
+                path_folder     = args.path_folder,
+                metric_name     = args.metric_name,
+                ascending       = args.ascending,
+                experiment_name = args.experiment_name,
+            )
     except Exception as error :
         print(f"Error while adding experiment : {error}")
         return 1
 
+    print(f"Experiment '{experiment_name}' added successfully.")
+
     return 0
+
+def _ensure_no_conflicting_flags(args : argparse.Namespace) -> None :
+    """
+    Check that ``--experiment_info_path`` is not combined with any other flag.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        The parsed ``add`` arguments.
+
+    Raises
+    ------
+    ValueError
+        If any other ``add`` flag is set alongside ``--experiment_info_path``.
+    """
+
+    conflicting = (
+        args.path_folder is not None
+        or args.experiment_name is not None
+        or args.metric_name is not None
+        or args.ascending
+        or args.descending
+    )
+
+    if conflicting :
+        raise ValueError(
+            "--experiment_info_path cannot be combined with any other flag "
+            "(path_folder, experiment_name, metric_name, ascending, descending)."
+        )
+
+def _ensure_required_add_flags(args : argparse.Namespace) -> None :
+    """
+    Check that the flags mandatory for a direct ``add`` are all present.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        The parsed ``add`` arguments.
+
+    Raises
+    ------
+    ValueError
+        If ``--path_folder``, ``--metric_name`` or the optimisation direction is missing. The mutually exclusive group already guarantees that ``--ascending`` and ``--descending`` are not passed together.
+    """
+
+    if args.path_folder is None :
+        raise ValueError("--path_folder is required (or use --experiment_info_path).")
+
+    if args.metric_name is None :
+        raise ValueError("--metric_name is required (or use --experiment_info_path).")
+
+    if not args.ascending and not args.descending :
+        raise ValueError("One of --ascending / --descending is required (or use --experiment_info_path).")
 
 def run_list(args : argparse.Namespace) -> int :
     """

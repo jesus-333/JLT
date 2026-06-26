@@ -6,6 +6,7 @@ Entry point for the **Jesus's LLM Tools (JLT)** wiki. Start here to navigate the
 
 - [`summaries/general_info.md`](summaries/general_info.md) — High-level overview: project purpose, CLI usage, repository structure and coding-style pointer.
 - [`summaries/backend.md`](summaries/backend.md) — Summary of the shared backend subpackage (`src/jlt/shared_knowledge/backend`).
+- [`summaries/autoresearch.md`](summaries/autoresearch.md) — Summary of the `autoresearch` tool (`src/jlt/autoresearch`): experiment configuration commands (`add`/`list`/`remove`).
 
 ## Instructions
 
