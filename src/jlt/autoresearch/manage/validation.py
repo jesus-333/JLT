@@ -5,6 +5,7 @@ Before an experiment is registered (see :func:`~jlt.autoresearch.manage.experime
 
 - the folder exists,
 - it contains a ``config`` sub-folder (where the experiment configuration files live),
+- it contains an ``experiment_description`` file (either ``.txt`` or ``.md``) describing the experiment, its purpose and what it wants to achieve,
 - it contains a ``run.py`` script that exposes a ``run`` function returning a numeric value (the metric to optimise).
 
 The ``run`` function is inspected **statically** through the :mod:`ast` module : the script is parsed but never imported nor executed, so checking an experiment is completely side-effect free (no risk of running arbitrary user code).
@@ -39,6 +40,12 @@ RUN_SCRIPT_NAME = "run.py"
 
 # Name of the mandatory function (inside ``run.py``) that runs the experiment.
 RUN_FUNCTION_NAME = "run"
+
+# Base name (without extension) of the mandatory file describing the experiment.
+EXPERIMENT_DESCRIPTION_BASENAME = "experiment_description"
+
+# Extensions accepted for the experiment description file.
+EXPERIMENT_DESCRIPTION_EXTENSIONS = (".txt", ".md")
 
 # Annotation identifiers that we accept as numeric. The comparison is done on a
 # lower-cased identifier and matches by prefix, so numpy-like aliases such as
@@ -81,7 +88,7 @@ def validate_experiment_folder(path_folder : str | Path) -> Path :
     Raises
     ------
     FileNotFoundError
-        If the folder, the ``config`` sub-folder or the ``run.py`` script is missing.
+        If the folder, the ``config`` sub-folder, the ``experiment_description`` (``.txt``/``.md``) file or the ``run.py`` script is missing.
     ValueError
         If ``run.py`` does not expose a ``run`` function, the function does not return a value, or its return annotation is recognised as non-numeric.
     """
@@ -109,12 +116,51 @@ def validate_experiment_folder(path_folder : str | Path) -> Path :
             f"The experiment folder must contain a '{RUN_SCRIPT_NAME}' script : {run_script}"
         )
 
+    # The ``experiment_description`` file must be present.
+    _check_experiment_description(path_folder)
+
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Check the run.py script
 
     _validate_run_script(run_script)
 
     return path_folder
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Experiment description helper
+
+def _check_experiment_description(path_folder : Path) -> None :
+    """
+    Check that the experiment folder contains a description file.
+
+    The folder must contain an ``experiment_description`` file with a ``.txt`` or ``.md`` extension, describing the experiment, its purpose and what it wants to achieve.
+
+    Parameters
+    ----------
+    path_folder : pathlib.Path
+        Path to the experiment folder.
+
+    Raises
+    ------
+    FileNotFoundError
+        If no ``experiment_description`` (``.txt``/``.md``) file is found.
+    """
+
+    description_present = any(
+        (path_folder / f"{EXPERIMENT_DESCRIPTION_BASENAME}{extension}").is_file()
+        for extension in EXPERIMENT_DESCRIPTION_EXTENSIONS
+    )
+
+    if not description_present :
+        accepted = " / ".join(
+            f"{EXPERIMENT_DESCRIPTION_BASENAME}{extension}"
+            for extension in EXPERIMENT_DESCRIPTION_EXTENSIONS
+        )
+        raise FileNotFoundError(
+            f"The experiment folder must contain an '{EXPERIMENT_DESCRIPTION_BASENAME}' file "
+            f"({accepted}) with a complete description of the experiment, its purpose and "
+            f"what it wants to achieve : {path_folder}"
+        )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # run.py inspection helpers
