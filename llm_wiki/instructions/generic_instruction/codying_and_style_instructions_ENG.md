@@ -45,6 +45,7 @@ Very long functions are better split into specific sub-functions.
 - In the future, `sphinx` will be used to auto-generate documentation. When referencing other modules/classes/functions inside docstrings, use the sphinx syntax that enables hyperlinks. For long links, use `~` to abbreviate the hyperlink to just its last component.
 - Even for single-line docstrings, always add a newline after the opening `"""` (see example below).
 - If you write a long comments/docstrings start a new line only after a period. Do not start a new line in the middle of a sentence.
+- If you have short sentences you can put it in the same line.
 
 ## Short Docstring Example
 
