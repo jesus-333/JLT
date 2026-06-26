@@ -7,6 +7,8 @@ Before an experiment is registered (see :func:`~jlt.autoresearch.manage.experime
 - it contains a ``config`` sub-folder (where the experiment configuration files live),
 - it contains a ``run.py`` script that exposes a ``run`` function returning a numeric value (the metric to optimise).
 
+The folder is also expected (but not required) to contain an ``experiment_description`` file (either ``.txt`` or ``.md``) describing the experiment, its purpose and what it wants to achieve. This file is optional : when it is missing a warning is emitted, but the experiment is still accepted.
+
 The ``run`` function is inspected **statically** through the :mod:`ast` module : the script is parsed but never imported nor executed, so checking an experiment is completely side-effect free (no risk of running arbitrary user code).
 
 The numeric nature of the return value is checked through the function return annotation. Static analysis cannot always tell whether an annotation denotes a numeric type, therefore three outcomes are possible :
@@ -39,6 +41,12 @@ RUN_SCRIPT_NAME = "run.py"
 
 # Name of the mandatory function (inside ``run.py``) that runs the experiment.
 RUN_FUNCTION_NAME = "run"
+
+# Base name (without extension) of the optional file describing the experiment.
+EXPERIMENT_DESCRIPTION_BASENAME = "experiment_description"
+
+# Extensions accepted for the experiment description file.
+EXPERIMENT_DESCRIPTION_EXTENSIONS = (".txt", ".md")
 
 # Annotation identifiers that we accept as numeric. The comparison is done on a
 # lower-cased identifier and matches by prefix, so numpy-like aliases such as
@@ -84,6 +92,11 @@ def validate_experiment_folder(path_folder : str | Path) -> Path :
         If the folder, the ``config`` sub-folder or the ``run.py`` script is missing.
     ValueError
         If ``run.py`` does not expose a ``run`` function, the function does not return a value, or its return annotation is recognised as non-numeric.
+
+    Warns
+    -----
+    UserWarning
+        If the optional ``experiment_description`` (``.txt``/``.md``) file is missing.
     """
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,7 +127,45 @@ def validate_experiment_folder(path_folder : str | Path) -> Path :
 
     _validate_run_script(run_script)
 
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # Check the optional experiment description file
+
+    _check_experiment_description(path_folder)
+
     return path_folder
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Experiment description helper
+
+def _check_experiment_description(path_folder : Path) -> None :
+    """
+    Check that the experiment folder contains a description file.
+
+    The folder is expected (but not required) to contain an ``experiment_description`` file with a ``.txt`` or ``.md`` extension, describing the experiment, its purpose and what it wants to achieve. The file is optional : when none is found a warning is emitted, but the experiment is still accepted.
+
+    Parameters
+    ----------
+    path_folder : pathlib.Path
+        Path to the (already validated) experiment folder.
+    """
+
+    description_present = any(
+        (path_folder / f"{EXPERIMENT_DESCRIPTION_BASENAME}{extension}").is_file()
+        for extension in EXPERIMENT_DESCRIPTION_EXTENSIONS
+    )
+
+    if not description_present :
+        accepted = " / ".join(
+            f"{EXPERIMENT_DESCRIPTION_BASENAME}{extension}"
+            for extension in EXPERIMENT_DESCRIPTION_EXTENSIONS
+        )
+        warnings.warn(
+            f"No '{EXPERIMENT_DESCRIPTION_BASENAME}' file ({accepted}) was found in the "
+            f"experiment folder. It is recommended to add one with a complete description "
+            f"of the experiment, its purpose and what it wants to achieve.",
+            UserWarning,
+            stacklevel = 2,
+        )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # run.py inspection helpers

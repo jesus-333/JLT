@@ -27,6 +27,8 @@ This folder must mandatorily contain two things:
   - This Python file must have a `run` function that returns a numeric value (the metric that `autoresearch` must optimize).
   - When the `run` command is implemented, `autoresearch` will execute precisely this `run` file.
 
+The folder may also optionally contain an `experiment_description` file (either `.txt` or `.md`) holding a complete description of the experiment, its purpose, and what it wants to achieve. This file is not mandatory: if it is missing, the experiment is still accepted but a warning is emitted recommending that one be added.
+
 ---
 
 # `add` Command
@@ -46,6 +48,7 @@ Once the path to the experiment files has been received, the following checks mu
 
 - That the path is valid and the folder exists.
 - That the `config` subfolder is present.
+- That an `experiment_description` file (`.txt` or `.md`) is present. This check is not mandatory: if no such file is found, let it pass but generate a warning recommending that one be added with a complete description of the experiment.
 - That the `run.py` script is present:
   - That it contains a `run` function.
   - That the `run` function returns a value:
