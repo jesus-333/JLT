@@ -1,12 +1,10 @@
 """
 ChatGPT backend (OpenAI models).
 
-This backend talks to OpenAI's models through the official ``openai`` Python
-SDK. It is a concrete implementation of
-:class:`~jlt.shared_knowledge.backend.generic.generic_backend`.
+This backend talks to OpenAI's models through the official ``openai`` Python SDK.
+It is a concrete implementation of :class:`~jlt.shared_knowledge.backend.generic.generic_backend`.
 
-The ``openai`` package is imported lazily so that simply importing this module
-does not require the SDK to be installed.
+The ``openai`` package is imported lazily so that simply importing this module does not require the SDK to be installed.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

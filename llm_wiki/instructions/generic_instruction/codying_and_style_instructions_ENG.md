@@ -39,11 +39,12 @@ Very long functions are better split into specific sub-functions.
 - When you add new `cli`, if they are made up of multiple word, use hyphen to separate them.
     - E.g. `my-multi-word-cli-command`
 
-## Docstrings
+## Docstrings and comments
 
 - Always use the **numpydoc** format for docstrings.
 - In the future, `sphinx` will be used to auto-generate documentation. When referencing other modules/classes/functions inside docstrings, use the sphinx syntax that enables hyperlinks. For long links, use `~` to abbreviate the hyperlink to just its last component.
 - Even for single-line docstrings, always add a newline after the opening `"""` (see example below).
+- If you write a long comments/docstrings start a new line only after a period. Do not start a new line in the middle of a sentence.
 
 ## Short Docstring Example
 
@@ -138,15 +139,12 @@ This is the same code with my style rules.
 """
 Command line entry point for Jesus's LLM Tools (JLT).
 
-JLT is a collection of LLM-powered tools. Every tool is invoked through the
-single ``jlt`` command using the syntax::
+JLT is a collection of LLM-powered tools. Every tool is invoked through the single ``jlt`` command using the syntax::
 
     jlt <tool_name> <tool_subcommand, tool variable, tool flags>
 
-Each tool lives in its own subpackage under ``jlt`` and exposes a
-``register(subparsers)`` function in its ``cli`` module. That function attaches
-the tool's own argument parser (with its subcommands, variables and flags) to
-the shared top-level parser, keeping every tool self-contained.
+Each tool lives in its own subpackage under ``jlt`` and exposes a ``register(subparsers)`` function in its ``cli`` module. 
+That function attaches the tool's own argument parser (with its subcommands, variables and flags) to the shared top-level parser, keeping every tool self-contained.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

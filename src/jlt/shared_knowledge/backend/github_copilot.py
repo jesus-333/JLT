@@ -115,8 +115,8 @@ class github_copilot_backend(generic_backend) :
         model       = self.config.get("model", DEFAULT_MODEL)
         base_url    = self.config.get("base_url", DEFAULT_BASE_URL)
 
-        # Copilot expects an integration id header in addition to the bearer
-        # token; the OpenAI SDK forwards ``default_headers`` on every request.
+        # Copilot expects an integration id header in addition to the bearer token.
+        # The OpenAI SDK forwards ``default_headers`` on every request.
         client = OpenAI(
             api_key         = api_key,
             base_url        = base_url,

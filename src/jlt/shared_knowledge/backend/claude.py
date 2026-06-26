@@ -101,8 +101,7 @@ class claude_backend(generic_backend) :
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # Lazy import of the SDK
 
-        # Imported here so that the dependency is only required when the backend
-        # is actually used.
+        # Imported here so that the dependency is only required when the backend is actually used.
         import anthropic
 
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,8 +111,7 @@ class claude_backend(generic_backend) :
         model       = self.config.get("model", DEFAULT_MODEL)
         max_tokens  = self.config.get("max_tokens", DEFAULT_MAX_TOKENS)
 
-        # ``api_key = None`` lets the SDK read ``ANTHROPIC_API_KEY`` from the
-        # environment.
+        # ``api_key = None`` lets the SDK read ``ANTHROPIC_API_KEY`` from the environment.
         client = anthropic.Anthropic(api_key = api_key)
 
         # ``system`` must be omitted (not ``None``) when not provided.

@@ -65,8 +65,7 @@ class ollama_backend(generic_backend) :
         Raises
         ------
         ValueError
-            If the dictionary is malformed (wrong ``backend_type``, missing
-            ``model``, invalid ``mode`` or missing cloud ``api_key``).
+            If the dictionary is malformed (wrong ``backend_type``, missing ``model``, invalid ``mode`` or missing cloud ``api_key``).
         """
 
         if not isinstance(config, dict) :

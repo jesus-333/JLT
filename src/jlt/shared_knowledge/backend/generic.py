@@ -43,9 +43,8 @@ class generic_backend(abc.ABC) :
     Parameters
     ----------
     config_path : str or pathlib.Path
-        Path to the file where this backend's configuration dictionary lives
-        (or will be saved). If the file already exists it is read and validated
-        through :meth:`update_config` during initialisation.
+        Path to the file where this backend's configuration dictionary lives (or will be saved).
+        If the file already exists it is read and validated through :meth:`update_config` during initialization.
 
     Attributes
     ----------
@@ -62,26 +61,27 @@ class generic_backend(abc.ABC) :
 
     def __init__(self, config_path : str | Path) -> None :
         """
-        Initialise the backend and load its configuration if available.
+        Initialize the backend and load its configuration if available.
         """
 
         self.config_path    = Path(config_path)
         self.config         = None
 
-        # If a configuration already exists at ``config_path`` load it now so
-        # the backend is immediately usable. ``update_config`` takes care of
-        # validating it before storing it.
+        # If a configuration already exists at ``config_path`` load it now so the backend is immediately usable. 
+        # ``update_config`` takes care of validating it before storing it.
         if self.config_path.is_file() :
             existing_config = read_config_file(self.config_path)
             self.update_config(existing_config)
+        else :
+            # Raise an error if the configuration file does not exist. This forces the user to provide a valid configuration before using the backend.
+            raise ValueError(f"No configuration file found at '{self.config_path}'. Please provide a valid configuration.")
 
     def update_config(self, config : dict) -> None :
         """
         Validate a configuration dictionary and persist it.
 
-        The dictionary is first checked through :meth:`check_config` (which is
-        backend specific). Only if the check passes is the configuration stored
-        in memory and saved to :attr:`config_path`.
+        The dictionary is first checked through :meth:`check_config` (which is backend specific).
+        Only if the check passes is the configuration stored in memory and saved to :attr:`config_path`.
 
         Parameters
         ----------
@@ -99,8 +99,7 @@ class generic_backend(abc.ABC) :
 
         self.config = config
 
-        # The configuration is always persisted as ``json`` inside the tool's
-        # config directory, regardless of the format it was provided in.
+        # The configuration is always persisted as ``json`` inside the tool's config directory, regardless of the format it was provided in.
         save_path = self.config_path.with_suffix(".json")
         write_config_file(save_path, config)
 
@@ -111,9 +110,7 @@ class generic_backend(abc.ABC) :
         """
         Read a configuration dictionary from a file and apply it.
 
-        This is a thin wrapper around :meth:`update_config`: it simply reads the
-        dictionary from ``file_path`` (supporting ``toml`` and ``json``) and
-        forwards it.
+        This is a thin wrapper around :meth:`update_config`: it simply reads the dictionary from ``file_path`` (supporting ``toml`` and ``json``) and forwards it.
 
         Parameters
         ----------
@@ -129,9 +126,8 @@ class generic_backend(abc.ABC) :
         """
         Validate a configuration dictionary (backend specific).
 
-        Implementations must raise an exception (typically :class:`ValueError`)
-        if ``config`` is not a valid configuration for the backend. The method
-        is called by :meth:`update_config` before the configuration is saved.
+        Implementations must raise an exception (typically :class:`ValueError`) if ``config`` is not a valid configuration for the backend.
+        The method is called by :meth:`update_config` before the configuration is saved.
 
         Parameters
         ----------
@@ -149,9 +145,8 @@ class generic_backend(abc.ABC) :
         """
         Send a single prompt to the LLM and return its textual answer.
 
-        This is the only provider specific call the high level methods
-        (:meth:`modify_file`, :meth:`read_file`, ...) rely on. Each concrete
-        backend implements it using its own SDK / API.
+        This is the only provider specific call the high level methods (:meth:`modify_file`, :meth:`read_file`, ...) rely on. 
+        Each concrete backend implements it using its own SDK / API.
 
         Parameters
         ----------
@@ -200,8 +195,8 @@ class generic_backend(abc.ABC) :
 
         if summarize :
             system_prompt = (
-                "You are a helpful assistant. Summarize the text the user "
-                "provides. Return only the summary, without any preamble."
+                "You are a helpful assistant. Summarize the text the user provides. "
+                "Return only the summary, without any preamble."
             )
             content = self._chat(prompt = content, system = system_prompt)
 
