@@ -106,10 +106,16 @@ survives if either is lost :
 <config_dir>/autoresearch/experiments/<name>/   ---> internal registry + backup
     info.json       ---> registry entry (path, metric, direction, log_folder)
     summary_log.md  readme.md  round.txt
-    round_<i>.md  metrics.csv  metrics.txt        (added/synced by `run`)
+    metrics.csv  metrics.txt                      (added/synced by `run`)
+    round_<i>_backup/                             (one per round, synced by `run`)
+        round_<i>.md                              the round log
+        config/<files>                            config snapshot used that round
 <experiment_parent>/jlt_log_<name>/              ---> copy next to the experiment
     summary_log.md  readme.md  round.txt
-    round_<i>.md  metrics.csv  metrics.txt        (produced by `run`)
+    metrics.csv  metrics.txt                      (produced by `run`)
+    round_<i>_backup/                             (one per round)
+        round_<i>.md
+        config/<files>
 ```
 
 `info.json` is JSON written sorted (via the shared `config_io`) and currently stores

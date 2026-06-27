@@ -42,7 +42,7 @@ and the final report of step 4 are the main pieces still missing.
 | `run` | ✅ Done | Runs **one optimisation round** per invocation. See [run deep-dive](autoresearch_run.md). |
 | `sync` | ✅ Done | Copies the log folder ↔ internal backup (`--reverse` to restore). |
 | Round counter (`round.txt`) | ✅ Done | Created `=0` at `add` time, incremented at the end of each round. |
-| Per-round logs (`round_<i>.md`) | ✅ Done | Built from an internal template; 3 sections filled by the LLM. |
+| Per-round logs + snapshots (`round_<i>_backup/`) | ✅ Done | Each round gets a `round_<i>_backup/` folder with its `round_<i>.md` log and a `config/` snapshot of the config used. |
 | Per-round metric tracking (`csv` + `txt`) | ✅ Done | `metrics.csv` (`round,<metric_name>`) + `metrics.txt`. |
 | `summary_log.md` updates | ✅ Done | Placeholder at `add` time; rewritten by the LLM each round. |
 | Safe config edits (backup + key check) | ✅ Done | Recursive key-path comparison; retried up to 3× then errors. |
