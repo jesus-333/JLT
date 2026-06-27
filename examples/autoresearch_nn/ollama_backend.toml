@@ -1,0 +1,4 @@
+backend_type="ollama"
+model="qwen3.5:9b"
+mode="local"
+host="http://localhost:11434"

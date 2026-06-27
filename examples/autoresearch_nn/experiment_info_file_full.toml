@@ -1,0 +1,5 @@
+path_folder		= "./full/"
+experiment_name	= "image_test_full"
+metric_name		= 'accuracy'
+ascending		= true
+descending		= false
