@@ -13,6 +13,7 @@ It exposes the following subcommands :
 - ``list`` (alias ``ls``) : list the registered experiments.
 - ``remove`` (alias ``rm``) : remove a registered experiment.
 - ``run`` : run a registered experiment.
+- ``sync`` : copy an experiment results between its log folder and the tool's internal backup.
 
 The actual work is delegated to :mod:`~jlt.autoresearch.manage` (registry operations) and :mod:`~jlt.autoresearch.run` (experiment execution).
 """
@@ -72,6 +73,7 @@ def register(subparsers : argparse._SubParsersAction) -> argparse.ArgumentParser
     _register_list(autoresearch_subparsers)
     _register_remove(autoresearch_subparsers)
     _register_run(autoresearch_subparsers)
+    _register_sync(autoresearch_subparsers)
 
     return parser
 
@@ -197,6 +199,33 @@ def _register_run(subparsers : argparse._SubParsersAction) -> None :
     )
 
     parser.set_defaults(func = run_run)
+
+def _register_sync(subparsers : argparse._SubParsersAction) -> None :
+    """
+    Register the ``sync`` subcommand.
+    """
+
+    parser = subparsers.add_parser(
+        "sync",
+        help        = "Copy an experiment results between its log folder and the tool's internal backup.",
+        description = "Copy an experiment results between its log folder and the tool's internal backup.",
+    )
+
+    parser.add_argument(
+        "--experiment_name",
+        type     = str,
+        required = False,
+        default  = None,
+        help     = "Name of the experiment to synchronise (optional). Defaults to the name of the current folder.",
+    )
+
+    parser.add_argument(
+        "--reverse",
+        action = "store_true",
+        help   = "Reverse the direction : copy the internal backup into the experiment log folder instead.",
+    )
+
+    parser.set_defaults(func = run_sync)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Subcommand entry points
@@ -369,5 +398,30 @@ def run_run(args : argparse.Namespace) -> int :
     except Exception as error :
         print(f"Error while running experiment '{args.experiment_name}' : {error}")
         return 1
+
+    return 0
+
+def run_sync(args : argparse.Namespace) -> int :
+    """
+    Entry point for ``jlt autoresearch sync``.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed arguments (uses ``experiment_name`` and ``reverse``).
+
+    Returns
+    -------
+    exit_code : int
+        ``0`` on success, ``1`` on error.
+    """
+
+    try :
+        run.sync_experiment(experiment_name = args.experiment_name, reverse = args.reverse)
+    except Exception as error :
+        print(f"Error while syncing experiment '{args.experiment_name}' : {error}")
+        return 1
+
+    print("Sync completed successfully.")
 
     return 0
