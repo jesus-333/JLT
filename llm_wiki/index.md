@@ -13,6 +13,7 @@ Entry point for the **Jesus's LLM Tools (JLT)** wiki. Start here to navigate the
 Files written by the maintainer describing new tasks and stuff to implement.
 
 - [`instructions/generic_instruction/codying_and_style_instructions_ENG.md`](instructions/generic_instruction/codying_and_style_instructions_ENG.md) — Single source of truth for coding style.
+- [`instructions/generic_instruction/file_writing.md`](instructions/generic_instruction/file_writing.md) — Request for a backend `write_file` helper (implemented as `generic_backend.write_file`).
 - [`instructions/generic_instruction/repo_setup_ENG.md`](instructions/generic_instruction/repo_setup_ENG.md) — Repository setup instructions.
 - [`instructions/backend/0_general_backend_setup_ENG.md`](instructions/backend/0_general_backend_setup_ENG.md) — Backend setup instructions.
 - `instructions/0_original_IT_files/` — Original Italian versions of the instruction files. Can be ignored.

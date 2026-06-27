@@ -34,6 +34,13 @@ from pathlib import Path
 from ..config_io import read_config_file, write_config_file
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Module constants
+
+# Plain text extensions a backend is allowed to write through :meth:`generic_backend.write_file`.
+# Kept as a module level constant so the list of supported extensions can be extended in a single place.
+SUPPORTED_WRITE_EXTENSIONS = ("txt", "md")
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Abstract base class
 
 class generic_backend(abc.ABC) :
@@ -234,6 +241,76 @@ class generic_backend(abc.ABC) :
             blocks.append(f"{header}\n{single_content}")
 
         return "\n\n".join(blocks)
+
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # File writing
+
+    def write_file(
+            self,
+            text        : str,
+            file_path   : str | Path,
+            extension   : str = "txt",
+        ) -> Path :
+        """
+        Create a text file containing ``text`` with the requested ``extension``.
+
+        This is the counterpart of :meth:`read_file` : instead of reading an existing file it creates a brand new one from a string already in memory.
+        It does not involve the LLM at all, it is a plain file write exposed on the backend so any tool (or the LLM driving it) has a single, uniform way to materialise text to disk.
+        A typical use case is letting the LLM produce the content of, for example, a new experiment config for :mod:`~jlt.autoresearch` and then persist it.
+
+        Parameters
+        ----------
+        text : str
+            The content to write into the file.
+        file_path : str or pathlib.Path
+            Destination path of the file. Any suffix already present is replaced
+            by ``extension`` so the resulting file always carries the requested
+            extension. Missing parent directories are created automatically.
+        extension : str, default ``"txt"``
+            Extension of the file to create, given without the leading dot (a
+            leading dot is tolerated and stripped). Only the extensions listed in
+            :data:`SUPPORTED_WRITE_EXTENSIONS` (``txt`` and ``md``) are allowed.
+
+        Returns
+        -------
+        written_path : pathlib.Path
+            The path of the file that was actually written.
+
+        Raises
+        ------
+        ValueError
+            If ``extension`` is not one of :data:`SUPPORTED_WRITE_EXTENSIONS`.
+        """
+
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # Input checks
+
+        # Normalise the extension : drop a possible leading dot and lower the case so ``"MD"``, ``".md"`` and ``"md"`` are all treated the same.
+        normalized_extension = extension.lstrip(".").lower()
+
+        if normalized_extension not in SUPPORTED_WRITE_EXTENSIONS :
+            supported = ", ".join(SUPPORTED_WRITE_EXTENSIONS)
+            raise ValueError(
+                f"Unsupported extension '{extension}' for writing. "
+                f"Supported extensions are : {supported}."
+            )
+
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # Resolve the destination path
+
+        # Force the chosen extension on the path so the caller can pass the
+        # destination with or without a suffix and still get a coherent file.
+        written_path = Path(file_path).with_suffix(f".{normalized_extension}")
+
+        # Make sure the parent directory exists before writing.
+        written_path.parent.mkdir(parents = True, exist_ok = True)
+
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # Actual writing
+
+        written_path.write_text(text, encoding = "utf-8")
+
+        return written_path
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # File editing
