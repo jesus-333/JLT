@@ -250,6 +250,7 @@ provider-specific primitives that each concrete backend must provide.
 | `modify_file(prompt, file_to_edit, other_files=None)` | Rewrites `file_to_edit` following `prompt`. `prompt` can be the instructions themselves *or* a path to a text file containing them. `other_files` is reserved for future use. |
 | `read_file(file_to_read, summarize=False)` | Reads a text file. If `summarize=True`, returns an LLM-generated summary instead. |
 | `read_files(list_of_files, summarize=False)` | Same as `read_file` but for a list; results are concatenated into one string, each block prefixed with its file path. |
+| `write_file(text, file_path, extension="txt")` | Creates a new text file containing `text`. The suffix of `file_path` is forced to `extension` (`txt` or `md` for now; a leading dot/uppercase is tolerated) and missing parent directories are created. Plain file write, no LLM involved. Returns the written `Path`. |
 
 #### Provider-specific primitives
 
@@ -279,6 +280,10 @@ summary = backend.read_file("paper.txt", summarize = True)
 
 # Read several files into one string
 combined = backend.read_files(["a.py", "b.py"])
+
+# Write a brand new text file (no LLM involved)
+backend.write_file("some content", "notes")                 # -> notes.txt
+backend.write_file("# Title", "report", extension = "md")    # -> report.md
 
 # Edit a file: instructions given directly...
 backend.modify_file("Add type hints to every function", "module.py")
