@@ -20,6 +20,9 @@ The experiment *code* is never modified : only its configuration files are.
 
 from __future__ import annotations
 
+# Full module imports
+import shutil
+
 # Specific imports
 from pathlib import Path
 
@@ -93,8 +96,19 @@ def run_experiment(experiment_name : str) -> None :
     description = _load_description(path_folder)
     context.add("Experiment description", description)
 
-    current_round   = round_io.read_round(log_folder)
-    round_path      = log_folder / f"round_{current_round}.md"
+    # The round counter is created ``=1`` at registration time and incremented at
+    # the END of each round, so numbering is 1-based : the first round is round 1
+    # (``round_1.md``), the second round 2, and so on. Reading it here gives the
+    # number of the round about to run (a round that fails before the end therefore
+    # does not consume its number).
+    current_round = round_io.read_round(log_folder)
+
+    # Each round gets its own ``round_<i>_backup`` folder holding the round log
+    # and, later, a copy of the config that produced the result : together they
+    # make the round reproducible. The round log lives inside this folder.
+    round_backup_dir = log_folder / f"round_{current_round}_backup"
+    round_backup_dir.mkdir(parents = True, exist_ok = True)
+    round_path = round_backup_dir / f"round_{current_round}.md"
 
     summary_log = (log_folder / SUMMARY_LOG_FILE_NAME).read_text(encoding = "utf-8")
     context.add("Summary log of previous rounds", summary_log)
@@ -147,6 +161,10 @@ def run_experiment(experiment_name : str) -> None :
         instructions = _build_config_instructions(config_instructions),
     )
 
+    # Snapshot the config as modified for this round, so the round can be
+    # reproduced later from its own backup folder.
+    _backup_round_configs(config_dir, round_backup_dir)
+
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Run the experiment and record the metric
 
@@ -172,6 +190,8 @@ def run_experiment(experiment_name : str) -> None :
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Bump the round counter and back everything up (last step)
 
+    # The counter is incremented only now, at the end : a round that fails earlier
+    # does not consume its number, so the next run retries with the same number.
     round_io.increment_round(log_folder)
     sync_experiment(experiment_name)
 
@@ -268,19 +288,24 @@ def _maybe_read_previous_rounds(context : round_context, backend, log_folder : P
     if not chosen_names :
         return
 
-    chosen_paths = [log_folder / name for name in chosen_names]
+    # Resolve the chosen basenames back to their real paths (each round log lives
+    # inside its own ``round_<i>_backup`` folder).
+    name_to_path = {path.name : path for path in available_files}
+    chosen_paths = [name_to_path[name] for name in chosen_names]
     context.add("Selected previous round reports", backend.read_files(chosen_paths))
 
 def _list_previous_round_files(log_folder : Path, current_round : int) -> list :
     """
     Return the previous ``round_<i>.md`` report files of an experiment.
 
+    Each round log lives inside its own ``round_<i>_backup`` folder, so this looks one level down rather than at the top of the log folder.
+
     Parameters
     ----------
     log_folder : pathlib.Path
         The ``jlt_log_<name>`` folder of the experiment.
     current_round : int
-        The round about to be run : its own ``round_<current_round>.md`` file is excluded.
+        The round about to be run : its own ``round_<current_round>_backup`` folder is excluded.
 
     Returns
     -------
@@ -288,12 +313,12 @@ def _list_previous_round_files(log_folder : Path, current_round : int) -> list :
         The sorted list of previous round report files (as :class:`~pathlib.Path`).
     """
 
-    current_file = f"round_{current_round}.md"
+    current_backup = f"round_{current_round}_backup"
 
     return sorted(
         path
-        for path in log_folder.glob("round_*.md")
-        if path.name != current_file
+        for path in log_folder.glob("round_*_backup/round_*.md")
+        if path.parent.name != current_backup
     )
 
 def _build_config_instructions(config_update_text : str) -> str :
@@ -321,6 +346,28 @@ def _build_config_instructions(config_update_text : str) -> str :
         "- Keep the original file format and structure intact.\n"
         "- If a described change does not apply to this particular file, leave that file unchanged."
     )
+
+def _backup_round_configs(config_dir : Path, round_backup_dir : Path) -> None :
+    """
+    Copy the (just modified) experiment config files into the round backup folder.
+
+    The files are copied under ``<round_backup_dir>/config/``, preserving the experiment's ``config`` layout, so the snapshot is a drop-in replacement for the experiment's own ``config`` folder when reproducing the round.
+
+    Parameters
+    ----------
+    config_dir : pathlib.Path
+        The experiment ``config`` folder (whose files were just updated for this round).
+    round_backup_dir : pathlib.Path
+        The ``round_<i>_backup`` folder of the current round.
+    """
+
+    destination = round_backup_dir / CONFIG_SUBFOLDER_NAME
+    destination.mkdir(parents = True, exist_ok = True)
+
+    # Reuse the same enumeration ``update_all_configs`` used, so the snapshot
+    # matches exactly the files that were edited.
+    for config_file in config_update.list_config_files(config_dir) :
+        shutil.copy2(config_file, destination / config_file.name)
 
 def _update_summary_log(
         backend,

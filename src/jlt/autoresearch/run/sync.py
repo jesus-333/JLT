@@ -11,6 +11,7 @@ By default it copies the external log folder into the internal backup (this is t
 With ``reverse = True`` it copies the internal backup back into the external folder, which is useful to restore the experiment files if the external folder is lost.
 
 The synchronisation is **copy only** : it never deletes files at the destination, and it never touches the internal ``info.json`` registry entry (that file is metadata, not a log artifact).
+It copies the whole log folder **recursively**, so the per-round ``round_<i>_backup`` sub-folders (each holding a round log and a copy of the config that produced it) are mirrored as well.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,19 +86,22 @@ def sync_experiment(experiment_name : str | None = None, reverse : bool = False)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Helper functions
 
-def _copy_log_files(source : Path, destination : Path) -> None :
+def _copy_log_files(source : Path, destination : Path, skip_info : bool = True) -> None :
     """
-    Copy every log file from ``source`` to ``destination``.
+    Recursively copy the content of ``source`` into ``destination``.
 
-    The copy is shallow on purpose (the log folders only contain files, no sub-folders) and skips the internal ``info.json`` registry entry so the registry metadata is never overwritten by a log synchronisation.
+    Files are copied and sub-folders are mirrored, so the per-round ``round_<i>_backup`` folders are synchronised together with the top-level cumulative files.
+    The internal ``info.json`` registry entry is skipped at the top level so the registry metadata is never overwritten by a log synchronisation.
     Existing files at the destination are overwritten ; files only present at the destination are left untouched (the sync never deletes).
 
     Parameters
     ----------
     source : pathlib.Path
-        The folder to copy the files from.
+        The folder to copy the content from.
     destination : pathlib.Path
-        The folder to copy the files into. It is created if missing.
+        The folder to copy the content into. It is created if missing.
+    skip_info : bool, default True
+        Whether to skip ``info.json`` at this level. It is ``True`` only for the top-level call (where the registry entry lives) and ``False`` while recursing, so a config file inside a backup sub-folder is never mistaken for the registry entry.
     """
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,19 +110,20 @@ def _copy_log_files(source : Path, destination : Path) -> None :
     destination.mkdir(parents = True, exist_ok = True)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    # Copy every file (skipping the registry metadata)
+    # Copy every entry (recursing into sub-folders)
 
     for item in source.iterdir() :
 
-        # Only files are expected in a log folder ; ignore anything else (e.g. a
-        # stray sub-folder) to keep the operation simple and predictable.
-        if not item.is_file() :
-            continue
-
         # ``info.json`` is the registry entry, not a log artifact : never copy it
-        # so the registry metadata is preserved on both sides.
-        if item.name == registry.INFO_FILE_NAME :
+        # (only relevant at the top level, where the registry entry lives).
+        if skip_info and item.name == registry.INFO_FILE_NAME :
             continue
 
-        # ``copy2`` preserves the file metadata (e.g. modification time).
-        shutil.copy2(item, destination / item.name)
+        target = destination / item.name
+
+        if item.is_dir() :
+            # Mirror the sub-folder (e.g. a ``round_<i>_backup`` folder).
+            _copy_log_files(item, target, skip_info = False)
+        elif item.is_file() :
+            # ``copy2`` preserves the file metadata (e.g. modification time).
+            shutil.copy2(item, target)
