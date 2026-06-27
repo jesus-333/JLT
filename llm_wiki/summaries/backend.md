@@ -229,7 +229,7 @@ reuse them without importing the backend package):
 
 ```
 src/jlt/shared_knowledge/
-    config_io.py         ---> read toml/json, write json
+    config_io.py         ---> read toml/json, write json/toml
     paths.py             ---> get_config_dir (the JLT config root)
 ```
 
@@ -247,6 +247,7 @@ provider-specific primitives that each concrete backend must provide.
 | `update_config(config)` | Validates a config dictionary (via `check_config`) and saves it. Also called from `__init__`. |
 | `update_config_from_file(file_path)` | Reads a dictionary from a `toml`/`json` file, then calls `update_config`. |
 | `check_config(config)` | **Abstract.** Backend-specific validity check. Called by `update_config` before saving. |
+| `chat(prompt, system=None)` | Send a single prompt to the LLM and return its answer. A thin public passthrough to the `_chat` primitive, for tools that need a free-form prompt (e.g. an interactive, multi-step exchange). The backend stays stateless — any conversation memory is the caller's responsibility. |
 | `modify_file(prompt, file_to_edit, other_files=None)` | Rewrites `file_to_edit` following `prompt`. `prompt` can be the instructions themselves *or* a path to a text file containing them. `other_files` is reserved for future use. |
 | `read_file(file_to_read, summarize=False)` | Reads a text file. If `summarize=True`, returns an LLM-generated summary instead. |
 | `read_files(list_of_files, summarize=False)` | Same as `read_file` but for a list; results are concatenated into one string, each block prefixed with its file path. |

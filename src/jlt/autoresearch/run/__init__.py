@@ -14,7 +14,9 @@ from __future__ import annotations
 
 # Internal imports
 from .runner import run_experiment
+from .sync import sync_experiment
 
 __all__ = [
     "run_experiment",
+    "sync_experiment",
 ]

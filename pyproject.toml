@@ -16,9 +16,13 @@ authors = [
 ]
 description = "Jesus's LLM Tools (JLT): a collection of LLM-powered tools."
 requires-python = ">=3.11"
-# The core package has no hard dependency: each backend pulls its own provider
-# SDK through the optional-dependencies below (e.g. `pip install jlt[claude]`).
+# The core package only depends on `tomli-w` : the standard library can read
+# toml (`tomllib`) but cannot write it, and writing toml is needed to persist
+# experiment configuration files (see `jlt.shared_knowledge.config_io`).
+# Each backend still pulls its own provider SDK through the optional-dependencies
+# below (e.g. `pip install jlt[claude]`).
 dependencies = [
+    "tomli-w",
 ]
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
