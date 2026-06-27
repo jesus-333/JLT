@@ -1,0 +1,37 @@
+# Configuration for the "subset" example experiment.
+#
+# These are the hyperparameters the autoresearch optimisation loop is allowed to
+# tweak between rounds. Only the VALUES change : the set of keys must stay intact
+# (autoresearch enforces this after every edit).
+#
+# num_classes is NOT listed here : it is derived from the data (10 for the subset
+# experiment) and passed to the model automatically.
+
+# - - - CNN backbone - - -
+use_cnn_backbone = true
+n_cnn_layer      = 2
+cnn_layer_size   = [16, 32]   # output channels of each conv layer
+pool_layer_size  = [2, 2]     # MaxPool kernel of each conv layer
+dropout_2d_rate  = 0.0        # 0 disables 2D dropout
+batch_norm_cnn   = true
+
+# - - - Fully-connected head - - -
+n_fc_layer          = 1
+fc_layer_size       = [128]   # size of each fully-connected layer
+activation_function = "relu"  # relu | tanh | sigmoid | leaky_relu | elu | selu | gelu
+dropout_rate        = 0.0     # 0 disables dropout
+batch_norm_fc       = false
+
+# - - - Optimisation - - -
+learning_rate = 0.001
+optimizer     = "adam"          # sgd | adam | rmsprop | adagrad | adadelta | adamax | nadam
+batch_size    = 64
+num_epochs    = 10              # capped at 10 minutes of wall-clock per round
+loss_function = "cross_entropy" # cross_entropy | mse | mae | huber | kldiv | nll | bce | bce_with_logits
+
+# - - - Scheduler - - -
+use_scheduler = false
+gamma         = 0.9   # per-epoch LR decay when use_scheduler is true
+
+# - - - Reproducibility - - -
+seed = 42
