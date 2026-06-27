@@ -2,10 +2,10 @@
 Round-counter bookkeeping for the ``autoresearch`` ``run`` command.
 
 Each registered experiment keeps a ``round.txt`` file inside its ``jlt_log_<name>`` folder.
-The file holds a single integer : the number of rounds that have already been executed.
+The file holds a single integer : the number of the next round to run (numbering is 1-based, so the first round is round 1).
 The ``run`` command reads it to know which round it is about to run and increments it once the round is complete.
 
-The file is created (initialised to ``0``) at registration time by :func:`~jlt.autoresearch.manage.experiments._create_log_folder`, so the name of the file is defined there (:data:`~jlt.autoresearch.manage.experiments.ROUND_FILE_NAME`) and merely reused here to keep a single source of truth.
+The file is created (initialised to ``1``) at registration time by :func:`~jlt.autoresearch.manage.experiments._create_log_folder`, so the name of the file is defined there (:data:`~jlt.autoresearch.manage.experiments.ROUND_FILE_NAME`) and merely reused here to keep a single source of truth.
 """
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

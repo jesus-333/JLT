@@ -59,7 +59,7 @@ The orchestration lives in
 2. resolves the experiment name (defaulting to the folder name) and **refuses to overwrite**
    an existing registration — the user must `remove` first ;
 3. creates the external log folder `jlt_log_<name>` next to the experiment, populated with
-   `summary_log.md` (a placeholder), `readme.md` and `round.txt` (=`0`) by
+   `summary_log.md` (a placeholder), `readme.md` and `round.txt` (=`1`, the next round to run) by
    `_create_log_folder` ;
 4. writes the registry entry `info.json` and mirrors the same log files into the tool's
    internal backup folder (a second `_create_log_folder` call).

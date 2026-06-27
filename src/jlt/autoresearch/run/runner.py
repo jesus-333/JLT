@@ -96,6 +96,11 @@ def run_experiment(experiment_name : str) -> None :
     description = _load_description(path_folder)
     context.add("Experiment description", description)
 
+    # The round counter is created ``=1`` at registration time and incremented at
+    # the END of each round, so numbering is 1-based : the first round is round 1
+    # (``round_1.md``), the second round 2, and so on. Reading it here gives the
+    # number of the round about to run (a round that fails before the end therefore
+    # does not consume its number).
     current_round = round_io.read_round(log_folder)
 
     # Each round gets its own ``round_<i>_backup`` folder holding the round log
@@ -185,6 +190,8 @@ def run_experiment(experiment_name : str) -> None :
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Bump the round counter and back everything up (last step)
 
+    # The counter is incremented only now, at the end : a round that fails earlier
+    # does not consume its number, so the next run retries with the same number.
     round_io.increment_round(log_folder)
     sync_experiment(experiment_name)
 
