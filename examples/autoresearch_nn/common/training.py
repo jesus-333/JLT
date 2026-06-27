@@ -57,11 +57,18 @@ def train_and_evaluate(config : dict, train_loader, val_loader, num_classes : in
     validate_config(config, num_classes)
     set_seed(config["seed"])
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available() :
+        device = torch.device("cuda")
+        print("CUDA backend in use")
+    elif torch.backends.mps.is_available():
+        device = torch.device("mps")
+        print("mps backend (apple metal) in use")
+    else:
+        device = torch.device("cpu")
+        print("No backend in use. Device set to cpu")
 
-    # Infer the input geometry from an actual batch rather than hard-coding it :
-    # this keeps the training loop independent of the data module and lets it be
-    # exercised with any loader (e.g. a synthetic one in a smoke test).
+    # Infer the input geometry from an actual batch rather than hard-coding it.
+    # This keeps the training loop independent of the data module and lets it be exercised with any loader (e.g. a synthetic one in a smoke test).
     in_channels, in_hw = _infer_input_shape(train_loader)
 
     model     = build_model(config, in_channels, in_hw, num_classes).to(device)

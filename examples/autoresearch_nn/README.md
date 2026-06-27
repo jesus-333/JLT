@@ -1,9 +1,6 @@
 # Example `autoresearch` experiment — neural-network training
 
-A runnable, end-to-end example for the `jlt autoresearch run` command. It trains a configurable
-PyTorch image classifier on a dataset built by **combining four `torchvision` datasets**
-(FashionMNIST, KMNIST, EMNIST, CIFAR10) and the metric `autoresearch` optimises is the
-**top-1 accuracy on the validation set** (maximise).
+A runnable, end-to-end example for the `jlt autoresearch run` command. It trains a configurable PyTorch image classifier on a dataset built by **combining four `torchvision` datasets** (FashionMNIST, KMNIST, EMNIST, CIFAR10) and the metric `autoresearch` optimises is the **top-1 accuracy on the validation set** (maximise).
 
 There are **two experiments** sharing one code base :
 
@@ -12,8 +9,7 @@ There are **two experiments** sharing one code base :
 | [`full/`](full) | full combined datasets, all classes | 77 (EMNIST `balanced`) | slow on CPU — usually hits the 10-min cap |
 | [`subset/`](subset) | small subsample, 10 selected classes spanning all 4 datasets | 10 | fast — ~1–3 min/round |
 
-Each round runs for at most `num_epochs` epochs **or 10 minutes** of wall-clock time, whichever
-comes first.
+Each round runs for at most `num_epochs` epochs **or 10 minutes** of wall-clock time, whichever comes first.
 
 ## Layout
 
@@ -25,8 +21,7 @@ examples/autoresearch_nn/
     data/        torchvision downloads (created on first run, gitignored)
 ```
 
-Each experiment's `run.py` adds `common/` to `sys.path` and calls the shared pipeline, so the
-two differ only in how they wire it (which classes / how many samples).
+Each experiment's `run.py` adds `common/` to `sys.path` and calls the shared pipeline, so the two differ only in how they wire it (which classes / how many samples).
 
 ## Requirements
 

@@ -24,14 +24,12 @@ Once launched, the command works as follows. From inside the experiment folder:
 
 This is the general workflow. Several details are covered more thoroughly below.
 
-
 # `round_i.md` File Template
 
 A template file for `round_i.md` can be found [here](./template_round_i.md).
 
 This is a template for the log files produced each round.
 This template must be saved somewhere internally within the tool and used every time a new log is produced.
-
 
 # Keeping Track of the Round
 
@@ -40,7 +38,6 @@ At the end of each round, this number must be incremented by 1.
 
 This was not fully thought through previously and will therefore require modifications to the `jlt autoresearch add` command as well.
 Specifically, the `add` command must also create this file when registering an experiment. When created, the file must contain only a `0`, since obviously `0` rounds have been executed at that point.
-
 
 # Reading and Analysing Files During a Round
 
