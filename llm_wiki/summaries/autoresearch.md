@@ -154,33 +154,17 @@ through `JLT_CONFIG_DIR` / `XDG_CONFIG_HOME` / `~/.config/jlt` :
 
 ## Python implementation
 
-The autoresearch code lives under `src/jlt/autoresearch/`.
+The autoresearch code lives under `src/jlt/autoresearch/` : `cli.py` wires the
+subcommands, `manage/` handles experiment registration (`add` / `list` /
+`remove`, plus folder validation and on-disk storage) and `run/` handles
+execution (`run` and `sync`). It reuses the shared helpers under
+`src/jlt/shared_knowledge/` (`config_io`, `paths`, `backend`).
 
-```
-src/jlt/autoresearch/
-    cli.py                  ---> the `jlt autoresearch` command (subcommand wiring)
-    manage/
-        experiments.py      ---> public API : add / list / remove (orchestration)
-        registry.py         ---> on-disk storage of the registered experiments
-        validation.py       ---> static (ast-based) checks of an experiment folder
-    run/
-        runner.py           ---> run_experiment : orchestrates one optimisation round
-        round_io.py         ---> read / write / increment round.txt
-        round_template.py   ---> internal round_<i>.md template
-        conversation.py     ---> round_context (forwarded transcript) + answer parsers
-        config_update.py    ---> safe config edits (backup + recursive key check)
-        experiment_runner.py---> dynamic import + execution of run.py's run()
-        metrics_io.py       ---> append metric to metrics.csv / metrics.txt
-        sync.py             ---> sync_experiment : log folder <-> internal backup
-```
+For a module-by-module walkthrough see the detailed descriptions :
 
-The registry reuses two generic helpers that live directly under
-`src/jlt/shared_knowledge/` (not inside any specific tool) to avoid duplicating
-logic : `get_config_dir` from `shared_knowledge/paths.py` (the JLT configuration
-root) and the `toml`/`json` IO helpers from `shared_knowledge/config_io.py`.
-
-`run` additionally uses the LLM backend via
-`shared_knowledge.backend.load_backend`. Implementing it required two small
-shared-code additions : a TOML **writer** in `shared_knowledge/config_io.py`
-(so configs can be rewritten in `.toml` too — this adds the small `tomli-w` core
-dependency) and a public `chat()` passthrough on the generic backend.
+- [`detailed_descriptions/autoresearch_config.md`](../detailed_descriptions/autoresearch_config.md)
+  — experiment management (`add` / `list` / `remove`, validation, registry).
+- [`detailed_descriptions/autoresearch_run.md`](../detailed_descriptions/autoresearch_run.md)
+  — the `run` and `sync` commands.
+- [`detailed_descriptions/shared_knowledge.md`](../detailed_descriptions/shared_knowledge.md)
+  — code shared across tools.

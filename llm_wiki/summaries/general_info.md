@@ -30,7 +30,7 @@ Adding a new tool is essentially a one-line change in the `TOOLS` list of `src/j
             0_original_IT_files/    ---> Original version of the instructions files (in italian). Can be ignored.
             backend/                ---> Backend-related instructions (English)
             generic_instruction/    ---> Generic coding/style/repo-setup instructions (English)
-        detailed_descriptions/      ---> Detailed descriptions of how the code and repository work (to be populated)
+        detailed_descriptions/      ---> Detailed descriptions of how the code and repository work (per-tool deep-dives + status files)
         dump/                       ---> Scratch folder for WIP files (temporary descriptions, TODO lists, notes, ...)
         summaries/                  ---> Contains various summaries for the whole project
     scripts_sh/                     ---> Folder for any shell scripts to be used in the future
@@ -57,5 +57,5 @@ src/
 
 ## Coding Style
 
-When writing or modifying code in this repository, follow the conventions described in [`codying_and_style_instructions_ENG.md`](../instructions/generic_instruction/codying_and_style_instructions_ENG.md).
+When writing or modifying code in this repository, follow the conventions described in [`coding_style_instructions_ENG.md`](../instructions/generic_instruction/coding_style_instructions_ENG.md).
 That file is the single source of truth for the coding style and is kept separate from this summary so it can be updated independently.
