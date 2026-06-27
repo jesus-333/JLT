@@ -11,6 +11,15 @@ They are defaults, not laws — if you want one changed, tell me rather than let
 - **When a static check cannot be certain, warn and proceed** rather than hard-failing valid code; only raise an error for cases you can positively classify as wrong.
     Example: the numeric-return check in`autoresearch/manage/validation.py` accepts recognized numeric annotations, errors on recognized non-numeric ones (`str`, `list`, …), and merely *warns* on annotations it cannot classify (`float | None`, generics, missing).
 - **Registry / metadata files** are JSON written sorted (via the shared `config_io`). Their on-disk schema is provisional and may change as the tools evolve.
+- As a rule of thumb when you have to implement functions that have to check some input parameters et similia if something is detacted that is wrong always throw an error.
+    E.g. If you have to write a function that must receive in input a positive number, when you write the check for that input, throw an exception if receive any input that is not a positive number.
+    Do not fall back to some default value. Basically better safe than sorry.
+    There can be of exception to this rule but you have to motivate them very carefully.
+- If you have any doubt during implementation follow the "occam's razor"... or put it directly "simpler is better". 
+    Write the code as clear as possible. 
+    Try to avoid function too long or complex. 
+    If you noticed that similar code is used in more sections create a function with that code.
+    Comments everything. The code MUST BE easy to read and expand in future.
 
 ## Shared code & per-tool data layout
 

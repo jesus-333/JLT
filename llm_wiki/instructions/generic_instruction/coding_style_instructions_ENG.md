@@ -46,6 +46,7 @@ Very long functions are better split into specific sub-functions.
 - Even for single-line docstrings, always add a newline after the opening `"""` (see example below).
 - If you write a long comments/docstrings start a new line only after a period. Do not start a new line in the middle of a sentence.
 - If you have short sentences you can put it in the same line.
+- If you write word that can be written with both `s` and `z` use the version with `z` (e.g. optimized instead of optimised)
 
 ## Short Docstring Example
 
