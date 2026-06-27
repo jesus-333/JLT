@@ -10,7 +10,7 @@ Now we need to handle the experiment configuration part, meaning the actual impl
 
 # General Notes
 
-An *experiment* refers to an iterative hyperparameter optimisation process.
+An *experiment* refers to an iterative hyperparameter optimization process.
 Since it is an iterative process, the same experiment can be run multiple times (`round`).
 
 First of all, `autoresearch` will need something to keep track of all saved experiments.

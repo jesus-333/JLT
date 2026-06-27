@@ -247,23 +247,18 @@ class generic_backend(abc.ABC) :
         """
         Modify a file following the instructions contained in ``prompt``.
 
-        The current content of ``file_to_edit`` is sent to the LLM together with
-        the instructions, and the model's answer is written back to the file.
+        The current content of ``file_to_edit`` is sent to the LLM together with the instructions, and the model's answer is written back to the file.
 
         Parameters
         ----------
         prompt : str
-            The instructions to follow. It can either be the instructions
-            themselves or a path to a text file containing them. If ``prompt``
-            points to an existing file its content is read (via
-            :meth:`read_file`) and used as the instructions.
+            The instructions to follow. It can either be the instructions themselves or a path to a text file containing them.
+            If ``prompt`` points to an existing file its content is read (via :meth:`read_file`) and used as the instructions.
         file_to_edit : str or pathlib.Path
-            Path to the file that has to be modified. The file is overwritten
-            with the model's answer.
+            Path to the file that has to be modified. The file is overwritten with the model's answer.
         other_files : str, optional
-            Reserved for future use. The idea is to support prompts such as
-            "I gave you N files with instructions, use them to modify this other
-            file". Nothing is implemented for it yet.
+            Reserved for future use. The idea is to support prompts such as "I gave you N files with instructions, use them to modify this other file".
+            Nothing is implemented for it yet.
 
         Returns
         -------
@@ -274,8 +269,8 @@ class generic_backend(abc.ABC) :
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # Resolve the prompt (direct instructions or path to a file)
 
-        # If ``prompt`` is the path to an existing file, read the instructions
-        # from it. Otherwise treat ``prompt`` as the instructions themselves.
+        # If ``prompt`` is the path to an existing file, read the instructions from it.
+        # Otherwise treat ``prompt`` as the instructions themselves.
         if isinstance(prompt, (str, Path)) and Path(prompt).is_file() :
             instructions = self.read_file(prompt)
         else :
