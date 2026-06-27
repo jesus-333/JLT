@@ -245,6 +245,37 @@ class generic_backend(abc.ABC) :
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # File writing
 
+    def _write_text(self, path : str | Path, text : str) -> Path :
+        """
+        Low level primitive that writes ``text`` to ``path`` on disk.
+
+        This is the single place where the backend actually touches the filesystem to write text.
+        It only takes care of the mechanics (create the missing parent directories, then write the file as ``utf-8``) and performs no validation : the higher level methods (:meth:`write_file`, :meth:`modify_file`) are responsible for deciding *what* and *where* to write.
+        Keeping it separate lets every write go through one consistent code path.
+
+        Parameters
+        ----------
+        path : str or pathlib.Path
+            Destination path of the file. Missing parent directories are created
+            automatically.
+        text : str
+            The content to write into the file.
+
+        Returns
+        -------
+        written_path : pathlib.Path
+            The path of the file that was written.
+        """
+
+        written_path = Path(path)
+
+        # Make sure the parent directory exists before writing.
+        written_path.parent.mkdir(parents = True, exist_ok = True)
+
+        written_path.write_text(text, encoding = "utf-8")
+
+        return written_path
+
     def write_file(
             self,
             text        : str,
@@ -300,17 +331,13 @@ class generic_backend(abc.ABC) :
 
         # Force the chosen extension on the path so the caller can pass the
         # destination with or without a suffix and still get a coherent file.
-        written_path = Path(file_path).with_suffix(f".{normalized_extension}")
-
-        # Make sure the parent directory exists before writing.
-        written_path.parent.mkdir(parents = True, exist_ok = True)
+        destination_path = Path(file_path).with_suffix(f".{normalized_extension}")
 
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # Actual writing
 
-        written_path.write_text(text, encoding = "utf-8")
-
-        return written_path
+        # Delegate the actual filesystem write to the shared primitive.
+        return self._write_text(destination_path, text)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # File editing
@@ -384,6 +411,10 @@ class generic_backend(abc.ABC) :
 
         new_content = self._chat(prompt = user_prompt, system = system_prompt)
 
-        file_path.write_text(new_content, encoding = "utf-8")
+        # Write the answer back through the shared primitive so every write goes
+        # through one code path. Note that ``write_file`` is intentionally *not*
+        # reused here : it would force a ``txt``/``md`` suffix on the path, while
+        # ``modify_file`` must preserve the original file (e.g. ``.py``, ``.toml``).
+        self._write_text(file_path, new_content)
 
         return new_content
