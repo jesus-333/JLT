@@ -20,7 +20,11 @@ Files written by the maintainer describing new tasks and stuff to implement.
 
 ## Detailed descriptions
 
-- [`detailed_descriptions/`](detailed_descriptions/) — In-depth explanations of how the code and the repository work. To be populated over time. Separate from `instructions/`.
+In-depth explanations of how the code and the repository work (separate from `instructions/`, populated over time).
+
+- [`detailed_descriptions/autoresearch_status.md`](detailed_descriptions/autoresearch_status.md) — Status / roadmap of the `autoresearch` tool : what is implemented and what is still pending.
+- [`detailed_descriptions/autoresearch_run.md`](detailed_descriptions/autoresearch_run.md) — Technical deep-dive of the `autoresearch` `run` and `sync` commands.
+- [`detailed_descriptions/shared_knowledge.md`](detailed_descriptions/shared_knowledge.md) — Code shared across tools (`config_io`, `paths`, `backend`) and the cross-tool touchpoints.
 
 ## Dump
 
