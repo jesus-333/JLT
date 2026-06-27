@@ -108,6 +108,10 @@ jlt ar sync --experiment_name my_experiment              # log folder -> interna
 jlt ar sync --experiment_name my_experiment --reverse    # internal backup -> log folder
 ```
 
+A complete, runnable example experiment (training a PyTorch network on a combined
+FashionMNIST + KMNIST + EMNIST + CIFAR10 dataset) lives in
+[`examples/autoresearch_nn/`](../../examples/autoresearch_nn/).
+
 ## Where things are stored
 
 When an experiment is registered, its information is saved in **two** places.
