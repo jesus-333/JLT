@@ -276,7 +276,7 @@ def _create_log_folder(log_folder : Path, experiment_name : str) -> None :
 
     - a ``summary_log.md`` file (stating that no experiment has been run yet),
     - a ``readme.md`` file explaining the purpose of the folder,
-    - a ``round.txt`` file holding the number of executed rounds (initially ``0``).
+    - a ``round.txt`` file holding the number of the next round to run (initially ``1``).
 
     Existing files are left untouched, so calling this on an already populated folder never discards previous content.
 
@@ -310,12 +310,13 @@ def _create_log_folder(log_folder : Path, experiment_name : str) -> None :
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Create the round counter (only if it does not exist yet)
 
-    # The round counter starts at ``0`` : no round has been executed at
-    # registration time. It is incremented by the ``run`` command at the end of
-    # each round (see :mod:`~jlt.autoresearch.run.round_io`).
+    # The round counter starts at ``1`` : it holds the number of the next round to
+    # run, and the first round is round 1 (so its log is ``round_1.md``). It is
+    # incremented by the ``run`` command at the end of each round (see
+    # :mod:`~jlt.autoresearch.run.round_io`).
     round_file = log_folder / ROUND_FILE_NAME
     if not round_file.exists() :
-        round_file.write_text("0\n", encoding = "utf-8")
+        round_file.write_text("1\n", encoding = "utf-8")
 
 def _build_readme_content(experiment_name : str) -> str :
     """

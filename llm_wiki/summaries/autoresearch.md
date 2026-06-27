@@ -73,10 +73,11 @@ jlt autoresearch sync   [--experiment_name <name>] [--reverse]   # log folder <-
 - `remove` only deletes the registry entry : the original experiment folder and
   the `jlt_log_<experiment_name>` folder next to it are left untouched.
 - `run` performs **one round** : it needs an active LLM backend (see the
-  [backend tool](backend.md)) and produces a `round_<i>.md` log, appends the
-  metric to `metrics.csv`/`metrics.txt`, updates `summary_log.md`, increments
-  `round.txt` and syncs everything to the internal backup. The experiment code is
-  never modified — only the files in its `config` folder.
+  [backend tool](backend.md)) and produces a per-round `round_<i>_backup/` folder
+  (holding the `round_<i>.md` log and a copy of the config used that round),
+  appends the metric to `metrics.csv`/`metrics.txt`, updates `summary_log.md`,
+  increments `round.txt` and syncs everything to the internal backup. The
+  experiment code is never modified — only the files in its `config` folder.
 - `sync` copies the results between the `jlt_log_<name>` folder and the internal
   backup. `--experiment_name` defaults to the current folder name ; `--reverse`
   restores from the backup into the experiment folder. It never deletes files and
@@ -129,14 +130,16 @@ Both folders start with :
 - `summary_log.md` — a per-experiment summary (initially `"No experiment has
   been executed yet"`);
 - `readme.md` — a short description of the folder.
-- `round.txt` — the round counter (initially `0`).
+- `round.txt` — the round counter, i.e. the number of the next round to run (initially `1`, so the first round is `round_1`).
 
 The internal folder additionally stores `info.json`, the registry entry holding
 the experiment path, metric name and optimisation direction.
 
 Each `run` round then adds (and the final `sync` mirrors into the internal
-backup) a `round_<i>.md` log, the metric files `metrics.csv` / `metrics.txt`, and
-an updated `summary_log.md`. `info.json` is never synced.
+backup) a per-round folder `round_<i>_backup/` containing the round log
+`round_<i>.md` and a copy of the config used that round (`round_<i>_backup/config/`),
+plus the cumulative metric files `metrics.csv` / `metrics.txt` and an updated
+`summary_log.md`. `info.json` is never synced.
 
 The configuration directory is the same one used by every other JLT tool (e.g.
 the [backend subsystem](backend.md#where-configs-are-stored)) and is resolved
@@ -150,10 +153,12 @@ through `JLT_CONFIG_DIR` / `XDG_CONFIG_HOME` / `~/.config/jlt` :
                 info.json       ---> registry entry (path, metric, direction, ...)
                 summary_log.md  ---> backup of the per-experiment summary log
                 readme.md       ---> short description of the folder
-                round.txt       ---> round counter (created at add time, =0)
-                round_<i>.md    ---> per-round log (synced from a run)
+                round.txt       ---> next round number (created at add time, =1)
                 metrics.csv     ---> metric per round (synced from a run)
                 metrics.txt     ---> human-readable metric log (synced from a run)
+                round_<i>_backup/  ---> per-round snapshot (synced from a run)
+                    round_<i>.md   ---> the round log
+                    config/        ---> copy of the config used that round
 ```
 
 ## Python implementation

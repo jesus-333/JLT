@@ -54,7 +54,7 @@ has :
 - an internal registry entry `info.json` holding `path_folder`, `metric_name`,
   `optimization_direction` and `log_folder` ;
 - the external `jlt_log_<name>` folder next to the experiment, containing `summary_log.md`,
-  `readme.md` and `round.txt` (the latter created `=0` at registration time) ;
+  `readme.md` and `round.txt` (the latter created `=1` at registration time) ;
 - inside the experiment folder : the mandatory `experiment_description.txt`/`.md`, a
   `config` sub-folder and a `run.py` exposing a numeric `run` function.
 
@@ -69,13 +69,15 @@ ordered steps, with the code responsible for each :
    (`load_backend`) and create the round context.
 2. Read the mandatory `experiment_description.*` (`_load_description`) and add it to the
    context.
-3. Read the current round number `i` — `round_io.read_round` ; read `summary_log.md` and
-   add it to the context ; write `round_<i>.md` from the internal template.
+3. Read the round number `i` — `round_io.read_round` (numbering is 1-based : the first round is
+   `i = 1`) ; create the per-round folder `round_<i>_backup/` and write `round_<i>.md` **inside**
+   it from the internal template ; read `summary_log.md` and add it to the context.
 4. Optionally read previous round reports — `_maybe_read_previous_rounds` (the interactive
    yes/no + file-list exchange).
 5. Let the LLM write the *Summary Previous Rounds* and *Experiment Configuration Update*
    sections of `round_<i>.md` (`context.ask`, then `_write_round_file`).
-6. Apply the configuration changes — `config_update.update_all_configs`.
+6. Apply the configuration changes — `config_update.update_all_configs` — then snapshot the
+   modified config into `round_<i>_backup/config/` — `_backup_round_configs`.
 7. Run the experiment — `experiment_runner.run_experiment_script`, returning the numeric
    metric.
 8. Append the metric — `metrics_io.append_metric`.
@@ -121,6 +123,22 @@ runs the optional protocol from the spec :
    hallucinated or malformed name is silently dropped.
 4. The chosen files are read together with `backend.read_files` and added to the context.
 
+## The per-round backup folder (`round_<i>_backup/`)
+
+Every round owns a folder `jlt_log_<name>/round_<i>_backup/`, created at the start of the
+round, that makes the round **reproducible** : it gathers the round's log and a snapshot of the
+exact config that produced its result. Its content :
+
+- `round_<i>.md` — the round log (it lives here, **not** at the top level of the log folder) ;
+- `config/<files>` — a copy of the experiment's config files **as modified for this round**,
+  written by `_backup_round_configs` right after `update_all_configs`. The `config/` layout is
+  preserved, so the snapshot is a drop-in replacement for the experiment's own `config/` folder.
+
+The cumulative artifacts (`summary_log.md`, `metrics.csv`, `metrics.txt`, `round.txt`) stay at
+the top level of `jlt_log_<name>/` ; only the per-round log and config snapshot live in the
+backup folder. The whole `round_<i>_backup/` tree is mirrored into the internal backup by the
+final sync (see [Sync](#sync)).
+
 ## The `round_<i>.md` lifecycle
 
 The per-round log template lives as a module-level string in
@@ -134,12 +152,15 @@ sections, matched verbatim by the runner :
 # Result and analysis
 ```
 
-At the start of the round the template is written verbatim to `round_<i>.md` (so the file
-exists in its canonical empty form even if a later step fails). As the round progresses the
-file is **rebuilt from the captured section texts** (`_write_round_file`) rather than patched
-in place : rebuilding guarantees the three headers always stay present and in order, even on a
-partial round. The *Summary* and *Configuration Update* sections are filled in step 5, the
-*Result and analysis* section in step 9.
+At the start of the round the template is written verbatim to `round_<i>_backup/round_<i>.md`
+(so the file exists in its canonical empty form even if a later step fails). As the round
+progresses the file is **rebuilt from the captured section texts** (`_write_round_file`) rather
+than patched in place : rebuilding guarantees the three headers always stay present and in
+order, even on a partial round. The *Summary* and *Configuration Update* sections are filled in
+step 5, the *Result and analysis* section in step 9.
+
+The "read previous rounds" step (`_list_previous_round_files`) therefore looks one level down,
+globbing `round_*_backup/round_*.md`, to find earlier round logs.
 
 ## Safe configuration update
 
@@ -202,12 +223,13 @@ concise **cumulative** summary of all rounds so far (keeping the previous rounds
 ## The round counter
 
 [`run/round_io.py`](../../src/jlt/autoresearch/run/round_io.py) owns `round.txt`. The file
-holds a single integer and is created `=0` at registration time (by
-`manage.experiments._create_log_folder`, which reuses the `ROUND_FILE_NAME` constant defined
-there). `read_round` parses it (a malformed counter is a hard error, never silently reset),
-`write_round` overwrites it and `increment_round` bumps it by one. The increment happens as the
-penultimate step of a round, so a round number is only consumed once the round has actually
-completed.
+holds a single integer (the number of the **next** round to run) and is created `=1` at
+registration time (by `manage.experiments._create_log_folder`, which reuses the `ROUND_FILE_NAME`
+constant defined there). `read_round` parses it (a malformed counter is a hard error, never
+silently reset), `write_round` overwrites it and `increment_round` bumps it by one. The increment
+happens at the **end** of a round (step 11). Numbering is therefore 1-based — the first round is
+`round_1`, the second `round_2`, and so on — and a round that fails before the end does **not**
+consume its number (see [Failure semantics](#failure-semantics)).
 
 ## Sync
 
@@ -222,21 +244,24 @@ experiment's results in step. Each experiment has its logs in two places : the e
   default), then resolves both endpoints from the registry ;
 - copies the external folder into the internal backup by default (this is step 12 of a round),
   or the internal backup into the external folder when `reverse=True` (a restore) ;
-- is **copy only** : `_copy_log_files` overwrites/creates files at the destination but never
-  deletes, and it **skips `info.json`** so the registry metadata is never clobbered by a log
-  sync.
+- copies **recursively** : `_copy_log_files` mirrors sub-folders too, so each
+  `round_<i>_backup/` (with its `round_<i>.md` and `config/` snapshot) is synced together with
+  the top-level cumulative files ;
+- is **copy only** : it overwrites/creates files at the destination but never deletes, and it
+  **skips `info.json`** (only at the top level, where the registry entry lives) so the registry
+  metadata is never clobbered by a log sync.
 
 The same logic is exposed on the command line as `jlt autoresearch sync`
 (`--experiment_name`, `--reverse`).
 
 ## Failure semantics
 
-Errors are raised **before** the round counter is incremented and before the sync, so a failed
-round leaves `round.txt` untouched : the next `run` reuses the same round number (overwriting
-the partial `round_<i>.md`). A partial `round_<i>.md` may remain on disk, which is useful for
-debugging. The two most common failures are a configuration update that cannot keep the keys
-intact (after 3 retries) and an experiment `run` that raises or returns a non-numeric value ;
-both surface as a `RuntimeError`, which the CLI entry point turns into an
+The round counter is incremented only at the **end** of the round (step 11), before the final sync,
+so a failed round leaves `round.txt` **untouched** : the next `run` reuses the same round number
+(overwriting the partial `round_<i>_backup/`). A partial `round_<i>_backup/` may remain on disk,
+which is useful for debugging. The two most common failures are a configuration update that cannot
+keep the keys intact (after 3 retries) and an experiment `run` that raises or returns a non-numeric
+value ; both surface as a `RuntimeError`, which the CLI entry point turns into an
 `Error while running experiment ... : <error>` message and a non-zero exit code.
 
 ## Module map
