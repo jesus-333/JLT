@@ -60,11 +60,31 @@ def _write_json(path : Path, data : dict) -> None :
         # diffing two configurations much easier.
         json.dump(data, file_handle, indent = 4, sort_keys = True)
 
+def _write_toml(path : Path, data : dict) -> None :
+    """
+    Write ``data`` to ``path`` using the ``toml`` format.
+    """
+
+    # ``tomllib`` (standard library) can only *read* toml : writing needs the
+    # third-party ``tomli_w`` package. It is imported lazily (like the backend
+    # SDKs) so that simply importing this module never requires it ; a clear
+    # error is raised only if a toml write is actually attempted without it.
+    try :
+        import tomli_w
+    except ImportError as error :
+        raise ImportError(
+            "Writing 'toml' configuration files requires the 'tomli-w' package. "
+            "Install it with 'pip install tomli-w' (it ships as a core dependency of jlt)."
+        ) from error
+
+    # ``tomli_w`` requires the file to be opened in binary mode.
+    with path.open("wb") as file_handle :
+        tomli_w.dump(data, file_handle)
+
 # Map each supported file extension to the function that serialises it.
-# Only ``json`` is writable for now: it is the format used to persist the
-# configuration inside the tool's own config directory.
 WRITERS = {
     ".json" : _write_json,
+    ".toml" : _write_toml,
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

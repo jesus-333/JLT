@@ -169,6 +169,29 @@ class generic_backend(abc.ABC) :
 
         raise NotImplementedError
 
+    def chat(self, prompt : str, system : str | None = None) -> str :
+        """
+        Send a single prompt to the LLM and return its textual answer.
+
+        This is a thin public wrapper around the provider specific :meth:`_chat` primitive.
+        It lets a tool send a free-form prompt (e.g. to drive an interactive, multi-step exchange) without reaching into the "private" :meth:`_chat`.
+        The backend itself stays stateless : any conversation memory has to be handled by the caller (for instance by forwarding the previous context inside ``prompt``).
+
+        Parameters
+        ----------
+        prompt : str
+            The user prompt to send to the model.
+        system : str, optional
+            An optional system prompt that sets the behaviour of the model.
+
+        Returns
+        -------
+        answer : str
+            The model's textual answer.
+        """
+
+        return self._chat(prompt, system = system)
+
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # File reading
 
@@ -348,7 +371,17 @@ class generic_backend(abc.ABC) :
 
         # If ``prompt`` is the path to an existing file, read the instructions from it.
         # Otherwise treat ``prompt`` as the instructions themselves.
-        if isinstance(prompt, (str, Path)) and Path(prompt).is_file() :
+        # ``Path(prompt).is_file()`` raises ``OSError`` (e.g. "File name too long")
+        # when ``prompt`` is a long instruction string rather than a path, so the
+        # check is guarded : any such error simply means "not a file".
+        prompt_is_file = False
+        if isinstance(prompt, (str, Path)) :
+            try :
+                prompt_is_file = Path(prompt).is_file()
+            except OSError :
+                prompt_is_file = False
+
+        if prompt_is_file :
             instructions = self.read_file(prompt)
         else :
             instructions = str(prompt)
