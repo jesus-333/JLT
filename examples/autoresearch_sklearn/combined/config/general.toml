@@ -1,0 +1,29 @@
+# Common configuration shared by EVERY classifier of this experiment.
+#
+# These are the hyperparameters the autoresearch optimisation loop is allowed to
+# tweak between rounds. Only the VALUES change : the set of keys must stay intact
+# (autoresearch enforces this after every edit).
+#
+# This file is the "general" config of the example : it holds the settings that
+# apply to all classifiers (seed, data subsample size, shared preprocessing) plus
+# the `classifier` selector that decides WHICH algorithm is trained this round.
+# Each algorithm then has its own `<classifier>.toml` file next to this one.
+
+# - - - Which classifier to use this round - - -
+# Must match the basename of one of the sibling config files :
+#   logistic_regression | random_forest | svm | knn | decision_tree | gradient_boosting
+classifier = "random_forest"
+
+# - - - Data (combined-dataset subsample sizes) - - -
+# Maximum number of samples kept from each dataset's train / test split. Smaller
+# values make a round faster (some classifiers, e.g. the SVM, scale badly with
+# the number of samples).
+train_samples_per_dataset = 2000
+val_samples_per_dataset   = 500
+
+# - - - Shared preprocessing (applied before every classifier) - - -
+standardize   = true   # standardize features to zero mean / unit variance
+pca_components = 50     # number of PCA components ; 0 disables PCA entirely
+
+# - - - Reproducibility - - -
+seed = 42

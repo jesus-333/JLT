@@ -1,0 +1,12 @@
+# Hyperparameters for the RandomForestClassifier.
+#
+# Used only when general.toml has `classifier = "random_forest"`. Only the VALUES
+# may change between rounds ; the set of keys must stay intact.
+# See sklearn.ensemble.RandomForestClassifier for the meaning of each option.
+
+n_estimators      = 100      # number of trees in the forest
+max_depth         = 0        # maximum tree depth ; 0 means no limit (None)
+min_samples_split = 2        # minimum samples required to split an internal node
+min_samples_leaf  = 1        # minimum samples required at a leaf node
+max_features      = "sqrt"   # features considered per split : sqrt | log2 | all
+criterion         = "gini"   # split quality : gini | entropy | log_loss

@@ -1,0 +1,11 @@
+# Extra dependencies needed to RUN this example experiment (not needed to merely
+# register it with `jlt autoresearch add`, which only parses run.py statically).
+#
+# torch / torchvision are used only to download and decode the four datasets ;
+# the model itself is a classic scikit-learn estimator. Install the CPU build of
+# torch if you do not have a GPU, e.g. :
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+scikit-learn
+numpy
+torch
+torchvision

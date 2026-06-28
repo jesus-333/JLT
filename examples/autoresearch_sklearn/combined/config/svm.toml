@@ -1,0 +1,10 @@
+# Hyperparameters for the SVC (Support Vector Classifier).
+#
+# Used only when general.toml has `classifier = "svm"`. Only the VALUES may change
+# between rounds ; the set of keys must stay intact.
+# See sklearn.svm.SVC for the meaning of each option.
+
+C      = 1.0       # regularisation strength (smaller = stronger regularisation)
+kernel = "rbf"     # linear | poly | rbf | sigmoid
+gamma  = "scale"   # kernel coefficient : scale | auto
+degree = 3         # degree of the polynomial kernel (ignored by the other kernels)
