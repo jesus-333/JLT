@@ -115,9 +115,14 @@ jlt ar sync --experiment_name my_experiment              # log folder -> interna
 jlt ar sync --experiment_name my_experiment --reverse    # internal backup -> log folder
 ```
 
-A complete, runnable example experiment (training a PyTorch network on a combined
-FashionMNIST + KMNIST + EMNIST + CIFAR10 dataset) lives in
-[`examples/autoresearch_nn/`](../../examples/autoresearch_nn/).
+Two complete, runnable example experiments live under `examples/` :
+
+- [`examples/autoresearch_nn/`](../../examples/autoresearch_nn/) — training a PyTorch network on
+  a combined FashionMNIST + KMNIST + EMNIST + CIFAR10 dataset.
+- [`examples/autoresearch_sklearn/`](../../examples/autoresearch_sklearn/) — training classic
+  scikit-learn classifiers on the same combined dataset. It is built around **multiple config
+  files** (a shared `general.toml` plus one file per algorithm), so it doubles as a check of how
+  `autoresearch` handles experiments with several config files.
 
 ## Where things are stored
 

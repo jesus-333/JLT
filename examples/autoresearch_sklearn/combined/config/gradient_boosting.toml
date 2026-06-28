@@ -1,0 +1,11 @@
+# Hyperparameters for the GradientBoostingClassifier.
+#
+# Used only when general.toml has `classifier = "gradient_boosting"`. Only the
+# VALUES may change between rounds ; the set of keys must stay intact.
+# See sklearn.ensemble.GradientBoostingClassifier for the meaning of each option.
+
+n_estimators      = 100   # number of boosting stages
+learning_rate     = 0.1   # shrinkage applied to each stage's contribution
+max_depth         = 3     # maximum depth of each boosting tree
+min_samples_split = 2     # minimum samples required to split an internal node
+subsample         = 1.0   # fraction of samples used per stage (< 1.0 = stochastic boosting)
