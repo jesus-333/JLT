@@ -198,6 +198,12 @@ def _register_run(subparsers : argparse._SubParsersAction) -> None :
         help     = "Name of the experiment to run (mandatory). It must already be registered.",
     )
 
+    parser.add_argument(
+        "--verbose", "-v",
+        action = "store_true",
+        help   = "Print the reasoning/output produced by the LLM during the round (useful for debugging). Default : False.",
+    )
+
     parser.set_defaults(func = run_run)
 
 def _register_sync(subparsers : argparse._SubParsersAction) -> None :
@@ -385,7 +391,7 @@ def run_run(args : argparse.Namespace) -> int :
     Parameters
     ----------
     args : argparse.Namespace
-        Parsed arguments (uses ``experiment_name``).
+        Parsed arguments (uses ``experiment_name`` and ``verbose``).
 
     Returns
     -------
@@ -394,7 +400,7 @@ def run_run(args : argparse.Namespace) -> int :
     """
 
     try :
-        run.run_experiment(args.experiment_name)
+        run.run_experiment(args.experiment_name, verbose = args.verbose)
     except Exception as error :
         print(f"Error while running experiment '{args.experiment_name}' : {error}")
         return 1

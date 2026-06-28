@@ -13,6 +13,9 @@ The class is also used to drive the small interactive exchange in which the LLM 
 
 from __future__ import annotations
 
+# Internal imports
+from .verbose import print_llm_output
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Round context
 
@@ -26,6 +29,8 @@ class round_context :
     ----------
     backend : jlt.shared_knowledge.backend.generic.generic_backend
         The backend used to answer the questions.
+    verbose : bool, default ``False``
+        If ``True`` every :meth:`ask` exchange (the request and the model answer) is echoed to the terminal through :func:`~jlt.autoresearch.run.verbose.print_llm_output`, as a debugging aid.
 
     Attributes
     ----------
@@ -33,18 +38,21 @@ class round_context :
         The backend used to answer the questions.
     blocks : list
         The list of ``(label, text)`` blocks making up the running transcript.
+    verbose : bool
+        Whether the LLM reasoning/output is echoed to the terminal.
     """
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Construction
 
-    def __init__(self, backend) -> None :
+    def __init__(self, backend, verbose : bool = False) -> None :
         """
         Initialise an empty round context bound to a backend.
         """
 
         self.backend = backend
         self.blocks  = []
+        self.verbose = verbose
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Building the transcript
@@ -92,6 +100,16 @@ class round_context :
         )
 
         answer = self.backend.chat(full_prompt, system = system)
+
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # Optionally echo the exchange for debugging
+
+        # Only the current request (not the whole prepended transcript) and the
+        # answer are printed, so the verbose output stays readable instead of
+        # repeating the growing transcript at every step.
+        if self.verbose :
+            print_llm_output("LLM request", prompt)
+            print_llm_output("LLM answer", answer)
 
         # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         # Record the exchange so it becomes part of the context

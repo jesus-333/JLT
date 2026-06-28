@@ -32,6 +32,7 @@ from .conversation import round_context, _parse_yes_no, _parse_file_list
 from .experiment_runner import run_experiment_script
 from .round_template import load_round_template
 from .sync import sync_experiment
+from .verbose import print_llm_output
 from ..manage import registry
 from ..manage.experiments import SUMMARY_LOG_FILE_NAME
 from ..manage.validation import (
@@ -57,7 +58,7 @@ SECTION_PLACEHOLDER = "_(not filled yet)_"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Experiment execution function
 
-def run_experiment(experiment_name : str) -> None :
+def run_experiment(experiment_name : str, verbose : bool = False) -> None :
     """
     Run a single optimisation round of a registered experiment.
 
@@ -66,6 +67,8 @@ def run_experiment(experiment_name : str) -> None :
     experiment_name : str
         Name of the experiment to run.
         It must already be registered (see :func:`~jlt.autoresearch.manage.add_experiment`).
+    verbose : bool, default ``False``
+        If ``True`` the reasoning/output produced by the LLM at every step of the round (the conversational answers and the content written into the config / summary files) is echoed to the terminal, as a debugging aid.
 
     Raises
     ------
@@ -88,7 +91,7 @@ def run_experiment(experiment_name : str) -> None :
     direction   = info["optimization_direction"]
 
     backend = load_backend()
-    context = round_context(backend)
+    context = round_context(backend, verbose = verbose)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Read the mandatory context (description + summary log)
@@ -159,6 +162,7 @@ def run_experiment(experiment_name : str) -> None :
         backend      = backend,
         config_dir   = config_dir,
         instructions = _build_config_instructions(config_instructions),
+        verbose      = verbose,
     )
 
     # Snapshot the config as modified for this round, so the round can be
@@ -185,7 +189,7 @@ def run_experiment(experiment_name : str) -> None :
     ).strip()
     _write_round_file(round_path, sections)
 
-    _update_summary_log(backend, context, log_folder, current_round, metric_name, metric, direction)
+    _update_summary_log(backend, context, log_folder, current_round, metric_name, metric, direction, verbose = verbose)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # Bump the round counter and back everything up (last step)
@@ -377,6 +381,7 @@ def _update_summary_log(
         metric_name     : str,
         metric          : float,
         direction       : str,
+        verbose         : bool = False,
     ) -> None :
     """
     Update the experiment ``summary_log.md`` after a round.
@@ -399,6 +404,8 @@ def _update_summary_log(
         The metric value obtained in the round.
     direction : str
         The optimisation direction (``"ascending"`` / ``"descending"``).
+    verbose : bool, default ``False``
+        If ``True`` the new content the LLM writes into the summary log is echoed to the terminal (debugging aid).
     """
 
     summary_path = log_folder / SUMMARY_LOG_FILE_NAME
@@ -414,7 +421,11 @@ def _update_summary_log(
         "content of the summary log."
     )
 
-    backend.modify_file(prompt = instructions, file_to_edit = summary_path)
+    new_content = backend.modify_file(prompt = instructions, file_to_edit = summary_path)
+
+    # Echo the rewritten summary log so the user can inspect what the LLM produced.
+    if verbose :
+        print_llm_output("LLM output (summary log)", new_content)
 
 def _write_round_file(round_path : Path, sections : dict) -> None :
     """

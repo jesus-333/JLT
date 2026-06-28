@@ -59,7 +59,7 @@ jlt autoresearch add    --path_folder <path> --metric_name <name> (--ascending |
 jlt autoresearch add    --experiment_info_path <path>      # every field read from a json/toml file
 jlt autoresearch list                                      # list (alias: ls)
 jlt autoresearch remove --experiment_name <name>           # remove from the registry (alias: rm)
-jlt autoresearch run    --experiment_name <name>           # run one optimisation round
+jlt autoresearch run    --experiment_name <name> [--verbose | -v]   # run one optimisation round
 jlt autoresearch sync   [--experiment_name <name>] [--reverse]   # log folder <-> internal backup
 ```
 
@@ -78,6 +78,9 @@ jlt autoresearch sync   [--experiment_name <name>] [--reverse]   # log folder <-
   appends the metric to `metrics.csv`/`metrics.txt`, updates `summary_log.md`,
   increments `round.txt` and syncs everything to the internal backup. The
   experiment code is never modified — only the files in its `config` folder.
+  `--verbose`/`-v` echoes the LLM reasoning/output of every step (the
+  conversational answers and the content written into the config / summary
+  files) to the terminal, as a debugging aid.
 - `sync` copies the results between the `jlt_log_<name>` folder and the internal
   backup. `--experiment_name` defaults to the current folder name ; `--reverse`
   restores from the backup into the experiment folder. It never deletes files and
@@ -103,6 +106,9 @@ jlt ar rm --experiment_name my_experiment
 
 # Run one optimisation round (needs an active backend)
 jlt ar run --experiment_name my_experiment
+
+# Same, but print the LLM reasoning/output for debugging
+jlt ar run --experiment_name my_experiment --verbose
 
 # Manually back up / restore the results
 jlt ar sync --experiment_name my_experiment              # log folder -> internal backup

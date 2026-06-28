@@ -231,6 +231,24 @@ happens at the **end** of a round (step 11). Numbering is therefore 1-based — 
 `round_1`, the second `round_2`, and so on — and a round that fails before the end does **not**
 consume its number (see [Failure semantics](#failure-semantics)).
 
+## Verbose mode
+
+`jlt autoresearch run --verbose` (or `-v`) turns on a debugging echo of everything the
+LLM produces during the round. The flag is threaded from the CLI (`run_run`) into
+`run_experiment(experiment_name, verbose)` and from there to the two places where the LLM
+speaks :
+
+- the conversational steps go through `round_context` ; when constructed with `verbose=True`
+  its `ask` method prints each request and the model's answer (only the current request, not
+  the whole prepended transcript, so the output stays readable) ;
+- the `modify_file`-based steps — the per-file config rewrite (`config_update`) and the
+  `summary_log.md` rewrite (`_update_summary_log`) — print the new content the LLM wrote.
+
+All the printing is funnelled through `verbose.print_llm_output(label, text)`
+([`run/verbose.py`](../../src/jlt/autoresearch/run/verbose.py)), which frames each block with
+separator lines so the verbose output is easy to spot among the regular progress messages.
+When the flag is off nothing extra is printed and the round behaves exactly as before.
+
 ## Sync
 
 [`run/sync.py`](../../src/jlt/autoresearch/run/sync.py) keeps the two copies of an
@@ -278,6 +296,7 @@ All `run`-specific code lives under `src/jlt/autoresearch/run/` :
 | `experiment_runner.py` | Dynamic import and execution of `run.py`'s `run()`. |
 | `metrics_io.py` | Append the metric to `metrics.csv` / `metrics.txt`. |
 | `sync.py` | `sync_experiment` : log folder ↔ internal backup. |
+| `verbose.py` | `print_llm_output` : echo the LLM reasoning/output when `run --verbose`. |
 
 ## Limitations and future work
 
