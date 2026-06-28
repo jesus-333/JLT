@@ -131,11 +131,13 @@ jlt backend config   --backend_name <name> --path_file <path>   # create / updat
 jlt backend list                                                # list (alias: ls)
 jlt backend activate --backend_name <name>                      # set the active backend
 jlt backend remove   --backend_name <name>                      # delete (alias: rm)
+jlt backend check    --backend_name <name> [--message <msg>]    # send a message, print the reply
 ```
 
 - `config` infers the provider from the `backend_type` in `--path_file`.
 - `activate` and `remove` error out if the backend is not already configured.
 - Removing the active backend also clears the active pointer.
+- `check` sends `--message` (default `"Hi, I'm Jesus. How are you?"`) to the backend and prints the reply — a quick way to confirm a configured backend actually works.
 
 ## CLI examples
 
@@ -202,6 +204,17 @@ Configured backends :
 
 $ jlt backend rm --backend_name personal_claude
 Backend 'personal_claude' removed successfully.
+```
+
+### 5. Check a backend
+
+```bash
+# Assistant replies below are illustrative.
+$ jlt backend check --backend_name work_claude
+Hi Jesus! I'm doing well, thanks for asking. How can I help you today?
+
+$ jlt backend check --backend_name work_claude --message "Reply with just OK"
+OK
 ```
 
 ---
