@@ -73,5 +73,4 @@ jlt backend activate --backend_name "$BACKEND_NAME"
 echo "   Backend '${BACKEND_NAME}' is now active."
 
 echo ""
-echo "✓ Done. The github-copilot-sdk refreshes the Copilot token for you, so"
-echo "  there is no ~30 minute expiry to re-run for anymore."
+echo "✓ Done."
