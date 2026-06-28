@@ -1,0 +1,10 @@
+# Hyperparameters for the KNeighborsClassifier (k-nearest neighbours).
+#
+# Used only when general.toml has `classifier = "knn"`. Only the VALUES may change
+# between rounds ; the set of keys must stay intact.
+# See sklearn.neighbors.KNeighborsClassifier for the meaning of each option.
+
+n_neighbors = 5          # number of neighbours used for a prediction
+weights     = "uniform"  # neighbour weighting : uniform | distance
+p           = 2          # Minkowski power : 1 = manhattan, 2 = euclidean
+algorithm   = "auto"     # neighbour search : auto | ball_tree | kd_tree | brute

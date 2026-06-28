@@ -1,0 +1,10 @@
+# Hyperparameters for the LogisticRegression classifier.
+#
+# Used only when general.toml has `classifier = "logistic_regression"`. Only the
+# VALUES may change between rounds ; the set of keys must stay intact.
+# See sklearn.linear_model.LogisticRegression for the meaning of each option.
+
+C        = 1.0       # inverse regularisation strength (smaller = stronger regularisation)
+max_iter = 200       # maximum number of solver iterations
+solver   = "lbfgs"   # lbfgs | liblinear | saga | newton-cg | sag
+tol      = 1e-4      # stopping tolerance for the solver

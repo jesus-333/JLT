@@ -1,0 +1,5 @@
+path_folder		= "./combined/"
+experiment_name	= "sklearn_combined"
+metric_name		= 'accuracy'
+ascending		= true
+descending		= false
