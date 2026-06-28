@@ -24,6 +24,7 @@ from __future__ import annotations
 from pathlib import Path
 
 # Internal imports
+from .verbose import print_llm_output
 from ..manage.validation import CONFIG_SUBFOLDER_NAME
 from jlt.shared_knowledge.config_io import read_config_file
 
@@ -70,7 +71,7 @@ def list_config_files(config_dir : str | Path) -> list :
         if path.is_file() and path.suffix.lower() in CONFIG_FILE_EXTENSIONS
     )
 
-def update_all_configs(backend, config_dir : str | Path, instructions : str) -> None :
+def update_all_configs(backend, config_dir : str | Path, instructions : str, verbose : bool = False) -> None :
     """
     Apply the round configuration update to every config file of an experiment.
 
@@ -82,6 +83,8 @@ def update_all_configs(backend, config_dir : str | Path, instructions : str) -> 
         The ``config`` sub-folder of the experiment.
     instructions : str
         The instructions describing how the configuration should change this round (typically the "Experiment Configuration Update" section the LLM just wrote).
+    verbose : bool, default ``False``
+        If ``True`` the new content the LLM writes into each config file is echoed to the terminal (debugging aid).
 
     Raises
     ------
@@ -92,9 +95,9 @@ def update_all_configs(backend, config_dir : str | Path, instructions : str) -> 
     """
 
     for config_file in list_config_files(config_dir) :
-        apply_config_update(backend, config_file, instructions)
+        apply_config_update(backend, config_file, instructions, verbose = verbose)
 
-def apply_config_update(backend, config_file : str | Path, instructions : str) -> None :
+def apply_config_update(backend, config_file : str | Path, instructions : str, verbose : bool = False) -> None :
     """
     Rewrite a single config file following ``instructions``, keeping its keys intact.
 
@@ -109,6 +112,8 @@ def apply_config_update(backend, config_file : str | Path, instructions : str) -
         Path to the configuration file to update.
     instructions : str
         The instructions describing how the configuration should change.
+    verbose : bool, default ``False``
+        If ``True`` the new content the LLM writes into the file (at each attempt) is echoed to the terminal (debugging aid).
 
     Raises
     ------
@@ -132,7 +137,11 @@ def apply_config_update(backend, config_file : str | Path, instructions : str) -
     for attempt in range(1, MAX_CONFIG_RETRIES + 1) :
 
         # Let the LLM rewrite the file in place.
-        backend.modify_file(prompt = instructions, file_to_edit = config_file)
+        new_content = backend.modify_file(prompt = instructions, file_to_edit = config_file)
+
+        # Echo the rewritten file so the user can inspect what the LLM produced.
+        if verbose :
+            print_llm_output(f"LLM output (config file '{config_file.name}', attempt {attempt})", new_content)
 
         # Re-parse and compare the keys. A parse failure (the LLM produced an
         # invalid file) is treated exactly like a key mismatch : a failed attempt.
