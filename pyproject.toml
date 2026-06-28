@@ -32,10 +32,10 @@ dependencies = [
 # E.g. `pip install jlt[claude]` to use JLT with Claude only.
 claude         = ["anthropic"]
 chat_gpt       = ["openai"]
-github_copilot = ["openai"]
+github_copilot = ["github-copilot-sdk"]
 ollama         = ["ollama"]
 # Convenience extra installing the SDKs of every backend at once.
-all-backends   = ["anthropic", "openai", "ollama"]
+all-backends   = ["anthropic", "openai", "ollama", "github-copilot-sdk"]
 
 [project.scripts]
 jlt = "jlt.cli:main"

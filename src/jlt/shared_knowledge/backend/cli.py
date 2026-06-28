@@ -11,6 +11,7 @@ The ``backend`` tool manages the LLM backends shared across every JLT tool. It e
 - ``list`` (alias ``ls``) : list the configured backends.
 - ``activate`` : set which backend the tools should use.
 - ``remove`` (alias ``rm``) : remove a configured backend.
+- ``check`` : send a message to a backend and print its reply.
 
 The actual work is delegated to :mod:`~jlt.shared_knowledge.backend.registry`.
 """
@@ -25,6 +26,12 @@ import argparse
 
 # Internal imports
 from . import registry
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Module constants
+
+# Default message sent by ``jlt backend check`` when ``--message`` is omitted.
+DEFAULT_CHECK_MESSAGE = "Hi, I'm Jesus. How are you?"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Registration function
@@ -70,6 +77,7 @@ def register(subparsers : argparse._SubParsersAction) -> argparse.ArgumentParser
     _register_list(backend_subparsers)
     _register_activate(backend_subparsers)
     _register_remove(backend_subparsers)
+    _register_check(backend_subparsers)
 
     return parser
 
@@ -157,6 +165,35 @@ def _register_remove(subparsers : argparse._SubParsersAction) -> None :
     )
 
     parser.set_defaults(func = run_remove)
+
+def _register_check(subparsers : argparse._SubParsersAction) -> None :
+    """
+    Register the ``check`` subcommand.
+    """
+
+    parser = subparsers.add_parser(
+        "check",
+        help        = "Send a message to a backend and print its reply.",
+        description = "Send a message to a backend and print its reply. "
+                      "Useful to quickly verify a configured backend works.",
+    )
+
+    parser.add_argument(
+        "--backend_name",
+        type     = str,
+        required = True,
+        help     = "Name of the backend to query (mandatory). It must already be configured.",
+    )
+
+    parser.add_argument(
+        "--message",
+        type     = str,
+        required = False,
+        default  = DEFAULT_CHECK_MESSAGE,
+        help     = f"Message to send to the backend. Optional, defaults to \"{DEFAULT_CHECK_MESSAGE}\".",
+    )
+
+    parser.set_defaults(func = run_check)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Subcommand entry points
@@ -263,5 +300,31 @@ def run_remove(args : argparse.Namespace) -> int :
         return 1
 
     print(f"Backend '{args.backend_name}' removed successfully.")
+
+    return 0
+
+def run_check(args : argparse.Namespace) -> int :
+    """
+    Entry point for ``jlt backend check``.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed arguments (uses ``backend_name`` and ``message``).
+
+    Returns
+    -------
+    exit_code : int
+        ``0`` on success, ``1`` on error.
+    """
+
+    try :
+        backend = registry.load_backend(args.backend_name)
+        answer  = backend.chat(args.message)
+    except Exception as error :
+        print(f"Error while checking backend '{args.backend_name}' : {error}")
+        return 1
+
+    print(answer)
 
     return 0

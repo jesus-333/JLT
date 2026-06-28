@@ -42,7 +42,7 @@ through an optional extra, so you install only what you need:
 ```bash
 pip install jlt[claude]          # Anthropic SDK only
 pip install jlt[chat_gpt]        # OpenAI SDK only
-pip install jlt[github_copilot]  # OpenAI SDK (Copilot uses it)
+pip install jlt[github_copilot]  # GitHub Copilot SDK
 pip install jlt[ollama]          # Ollama SDK only
 pip install jlt[all-backends]    # every provider SDK at once
 ```
@@ -92,12 +92,17 @@ A configuration is a plain dictionary, stored on disk as `toml` or `json`. You p
 
 **`github_copilot`**
 
+Runs on the official [`github-copilot-sdk`](https://github.com/github/copilot-sdk),
+which handles the GitHub → Copilot token exchange (and refresh) internally. The
+SDK drives a separate runtime binary, downloaded once with
+`python -m copilot download-runtime` (or fetched automatically on first use).
+
 | Key | Required | Notes |
 | --- | --- | --- |
 | `backend_type` | yes | Must be `"github_copilot"`. |
-| `api_key` | yes | Copilot bearer token (sent as-is). |
+| `api_key` | no | An ordinary GitHub token (e.g. `gh auth token`). The alias `github_token` is also accepted. If omitted, the SDK uses the logged-in GitHub user. |
 | `model` | no | Defaults to `gpt-4o`. |
-| `base_url` | no | Defaults to `https://api.githubcopilot.com`. |
+| `timeout` | no | Seconds to wait for a single answer. Defaults to `300`. |
 
 ### Where configs are stored
 
@@ -126,11 +131,13 @@ jlt backend config   --backend_name <name> --path_file <path>   # create / updat
 jlt backend list                                                # list (alias: ls)
 jlt backend activate --backend_name <name>                      # set the active backend
 jlt backend remove   --backend_name <name>                      # delete (alias: rm)
+jlt backend check    --backend_name <name> [--message <msg>]    # send a message, print the reply
 ```
 
 - `config` infers the provider from the `backend_type` in `--path_file`.
 - `activate` and `remove` error out if the backend is not already configured.
 - Removing the active backend also clears the active pointer.
+- `check` sends `--message` (default `"Hi, I'm Jesus. How are you?"`) to the backend and prints the reply — a quick way to confirm a configured backend actually works.
 
 ## CLI examples
 
@@ -197,6 +204,17 @@ Configured backends :
 
 $ jlt backend rm --backend_name personal_claude
 Backend 'personal_claude' removed successfully.
+```
+
+### 5. Check a backend
+
+```bash
+# Assistant replies below are illustrative.
+$ jlt backend check --backend_name work_claude
+Hi Jesus! I'm doing well, thanks for asking. How can I help you today?
+
+$ jlt backend check --backend_name work_claude --message "Reply with just OK"
+OK
 ```
 
 ---

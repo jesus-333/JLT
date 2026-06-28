@@ -1,3 +1,5 @@
 backend_type = "github_copilot"
+# A GitHub token (e.g. the output of `gh auth token`). Optional : remove this
+# line to let the SDK authenticate through the logged-in GitHub user instead.
 api_key      = "null"
 model        = "gpt-4o"
