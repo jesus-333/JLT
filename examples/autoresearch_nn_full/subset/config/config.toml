@@ -24,7 +24,7 @@ batch_norm_fc       = false
 
 # - - - Optimisation - - -
 learning_rate = 0.001
-optimizer     = "adam"          # sgd | adam | rmsprop | adagrad | adadelta | adamax | nadam
+optimizer     = "adam"          # sgd | adam | rmsprop | adagrad | adadelta | adamax | nadam | adamw
 batch_size    = 64
 num_epochs    = 10              # capped at 10 minutes of wall-clock per round
 loss_function = "cross_entropy" # cross_entropy | mse | mae | huber | kldiv | nll | bce | bce_with_logits

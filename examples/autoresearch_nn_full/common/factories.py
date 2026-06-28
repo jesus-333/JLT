@@ -41,6 +41,7 @@ OPTIMIZERS = {
     "adagrad"  : optim.Adagrad,
     "adadelta" : optim.Adadelta,
     "adamax"   : optim.Adamax,
+    "adamw"    : optim.AdamW,
     "nadam"    : optim.NAdam,
 }
 

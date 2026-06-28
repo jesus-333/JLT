@@ -101,6 +101,11 @@ def train_and_evaluate(config : dict, train_loader, val_loader, num_classes : in
             loss   = loss_fn(logits, targets)
             loss.backward()
             optimizer.step()
+        
+        print("" + "-" * 42)
+        print(f"Epoch {epoch} completed in {time.monotonic() - start_time:.2f}s")
+        print(f"\tLoss : {loss.item():.4f}")
+        print(f"\tAccuracy (VAL): {_evaluate_accuracy(model, val_loader, device):.4f}")
 
         if time_is_up :
             print(f"Stopping early : reached the {MAX_RUNTIME_SECONDS}s time budget during epoch {epoch}.")

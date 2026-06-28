@@ -17,7 +17,7 @@ The config for this experiment are :
 - dropout_rate : float. Dropout rate to use in the fully connected layers. If 0, no dropout is applied
 - batch_norm_fc : Boolean. If True, apply batch normalization after each fully connected layer
 - learning_rate : float. Learning rate to use in the optimizer
-- optimizer : string. Optimizer to use. Can be one of ['sgd', 'adam', 'rmsprop', 'adagrad', 'adadelta', 'adamax', 'nadam']
+- optimizer : string. Optimizer to use. Can be one of ['sgd', 'adam', 'rmsprop', 'adagrad', 'adadelta', 'adamax', 'nadam', 'adamw']
 - batch_size : int. Batch size to use in the dataloader
 - num_epochs : int. Number of epochs to train the model
 - loss_function : string. Loss function to use. Can be one of ['cross_entropy', 'mse', 'mae', 'huber', 'kldiv', 'nll', 'bce', 'bce_with_logits']
