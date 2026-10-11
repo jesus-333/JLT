@@ -20,6 +20,12 @@ Where:
 The top-level parser lives in `src/jlt/cli.py`. Each tool exposes a `register(subparsers)` function in its own `cli` module, which attaches the tool's argument parser (with its subcommands, variables and flags) to the shared top-level parser. 
 Adding a new tool is essentially a one-line change in the `TOOLS` list of `src/jlt/cli.py`.
 
+The currently documented tools are:
+
+- `backend` — manages LLM backend configurations shared across tools.
+- `autoresearch` — manages and runs automated research experiments.
+- `support` — provides small utilities, including downloading Hugging Face model tensor metadata. See [`support.md`](support.md).
+
 ## Repository Structure
 
 ```
